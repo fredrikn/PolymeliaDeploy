@@ -120,7 +120,7 @@ namespace PolymeliaDeployClient.Forms
 
                         while (!cancellationToken.IsCancellationRequested)
                         {
-                            var reports = _reportClient.GetReports(taskId, latestTaskRunId);
+                            var reports = _reportClient.GetReports(taskId, latestTaskRunId).Result;
 
                             if (reports.Any())
                             {

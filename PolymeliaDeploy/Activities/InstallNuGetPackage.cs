@@ -355,21 +355,21 @@
             }
         }
 
-        private void LogInformation(string message, params object[] arguments)
+        private async void LogInformation(string message, params object[] arguments)
         {
             var msg = string.Format(message, arguments);
 
-            reportRemoteClient.Report(TaskId, AgentEnvironment.ServerRole, msg, DisplayName);
+            await reportRemoteClient.Report(TaskId, AgentEnvironment.ServerRole, msg, DisplayName);
 
             Console.WriteLine(msg);
         }
 
 
-        private void LogError(string message, params object[] arguments)
+        private async void LogError(string message, params object[] arguments)
         {
             var msg = string.Format(message, arguments);
 
-            this.reportRemoteClient.Report(TaskId, AgentEnvironment.ServerRole , msg, DisplayName, ReportStatus.Error);
+            await reportRemoteClient.Report(TaskId, AgentEnvironment.ServerRole , msg, DisplayName, ReportStatus.Error);
 
             Console.WriteLine(msg);
         }

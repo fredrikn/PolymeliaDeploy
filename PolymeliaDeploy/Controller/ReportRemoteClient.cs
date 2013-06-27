@@ -9,6 +9,7 @@ namespace PolymeliaDeploy.Controller
 
     using PolymeliaDeploy.Data;
     using System.Collections.Generic;
+    using System.Threading.Tasks;
 
 
     public class ReportRemoteClient : IReportClient
@@ -16,34 +17,26 @@ namespace PolymeliaDeploy.Controller
         HttpClient _client = null;
 
 
-        public IEnumerable<ActivityReport> GetReports(long taskId, long? fromLatestTaskId)
+        public async Task<IEnumerable<ActivityReport>> GetReports(long taskId, long? fromLatestTaskId)
         {
             //"reports/{TaskId}/{FromLastKnownId?}"
 
             using (var client = new ControllerClientFactory().CreateWebHttpClient())
             {
-                try
-                {
-                    var uri = string.Format("/reports/{0}/{1}", taskId, fromLatestTaskId.HasValue ? fromLatestTaskId.Value.ToString() : string.Empty);
+                var uri = string.Format("/reports/{0}/{1}", taskId, fromLatestTaskId.HasValue ? fromLatestTaskId.Value.ToString() : string.Empty);
 
-                    var response = client.GetAsync(uri).Result;
+                var response = await client.GetAsync(uri);
 
-                    if (response.IsSuccessStatusCode)
-                        return response.Content.ReadAsAsync<IEnumerable<ActivityReport>>().Result;
+                if (response.IsSuccessStatusCode)
+                    return await response.Content.ReadAsAsync<IEnumerable<ActivityReport>>();
 
-                    throw new HttpRequestException(
-                        string.Format("{0} ({1})", (int)response.StatusCode, response.ReasonPhrase));
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine("Can't access deploy controller or read its results. " + e);
-                    throw;
-                }
+                throw new HttpRequestException(
+                    string.Format("{0} ({1})", (int)response.StatusCode, response.ReasonPhrase));
             }
         }
 
 
-        public void Report(
+        public async Task Report(
                            long taskId,
                            string serverRole, 
                            string message, 
@@ -64,15 +57,16 @@ namespace PolymeliaDeploy.Controller
 
             var client = GetDeployWebHttpClient();
 
-            var response = client.PutAsync("report",
+            var response = await client.PutAsync("report",
                                     new ObjectContent(
                                         typeof(ActivityReport),
                                         report,
                                         new JsonMediaTypeFormatter()
-                                        )).Result;
+                                        ));
 
             if (!response.IsSuccessStatusCode)
-                Console.WriteLine("{0} ({1})", (int)response.StatusCode, response.ReasonPhrase);
+                throw new HttpRequestException(
+                    string.Format("{0} ({1})", (int)response.StatusCode, response.ReasonPhrase));
         }
 
 

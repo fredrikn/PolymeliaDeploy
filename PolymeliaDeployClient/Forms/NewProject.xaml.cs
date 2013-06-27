@@ -41,7 +41,7 @@ namespace PolymeliaDeployClient.Forms
 
             if (PreviousProjects == null)
             {
-                GetAllProjects();
+                Task.Run(() => GetAllProjects());
             }
             else
                 copyProjectComboBox.ItemsSource = PreviousProjects;

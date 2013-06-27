@@ -100,7 +100,6 @@ namespace PolymeliaDeploy.Management
                             errorReport(string.Format("Change virtual system state failed with error {0}", outParams["ReturnValue"]));
 
                         throw new ApplicationException(string.Format("Change virtual system state failed with error {0}", outParams["ReturnValue"]));
-                        break;
                     }
             }
         }
