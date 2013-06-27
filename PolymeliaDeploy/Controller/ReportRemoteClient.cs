@@ -88,7 +88,8 @@ namespace PolymeliaDeploy.Controller
 
         public void Dispose()
         {
-            _client.Dispose();
+            if (_client != null)
+                _client.Dispose();
         }
     }
 }
