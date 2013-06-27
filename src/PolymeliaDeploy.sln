@@ -1,8 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.20617.1 PREVIEW
-MinimumVisualStudioVersion = 10.0.40219.1
+# Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PolymeliaDeploy", "PolymeliaDeploy\PolymeliaDeploy.csproj", "{D95A6BB0-375B-4C3B-822F-D2325419CC9F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PolymeliaDeployAgent", "PolymeliaDeployAgent\PolymeliaDeployAgent.csproj", "{50D26AE4-CCD5-447D-9ABA-F07FE7716041}"
@@ -17,6 +15,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{EBCCC8
 		.nuget\NuGet.exe = .nuget\NuGet.exe
 		.nuget\NuGet.targets = .nuget\NuGet.targets
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PolymeliaDeploy.Tests", "PolymeliaDeploy.Tests\PolymeliaDeploy.Tests.csproj", "{520FDAA5-0FC5-466C-ADF7-B05D748A02AA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -40,6 +40,10 @@ Global
 		{181E33F4-279A-479C-9700-B989EB5D3739}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{181E33F4-279A-479C-9700-B989EB5D3739}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{181E33F4-279A-479C-9700-B989EB5D3739}.Release|Any CPU.Build.0 = Release|Any CPU
+		{520FDAA5-0FC5-466C-ADF7-B05D748A02AA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{520FDAA5-0FC5-466C-ADF7-B05D748A02AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{520FDAA5-0FC5-466C-ADF7-B05D748A02AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{520FDAA5-0FC5-466C-ADF7-B05D748A02AA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
