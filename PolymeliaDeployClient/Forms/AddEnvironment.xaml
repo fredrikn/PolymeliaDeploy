@@ -1,0 +1,86 @@
+﻿<Window x:Class="PolymeliaDeployClient.Forms.AddEnvironment"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Height="450"
+        Foreground="black"
+        Background="White"
+        WindowStyle="None"
+        WindowStartupLocation="CenterOwner"
+        AllowsTransparency="True"
+        ResizeMode="CanResizeWithGrip"
+        Width="650">
+    
+    <Grid Margin="30">
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="60"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="40"/>
+        </Grid.RowDefinitions>
+
+        <Grid>
+            <StackPanel VerticalAlignment="Center" Margin="0,4,0,4">
+
+                <TextBlock
+                    VerticalAlignment="Center"
+                    FontSize="12"
+                    Foreground="#aaaaaa"
+                    FontWeight="Black"
+                    Margin="0,0,0,8"
+                    Text="NEW ENVIRONMENT"/>
+
+                <TextBlock
+                    VerticalAlignment="Center"
+                    FontSize="25"
+                    Foreground="#6ac4ea"
+                    Text="Create an environment"/>
+
+            </StackPanel>
+            
+        </Grid>
+
+        <Grid Grid.Row="1" Margin="0,20,0,0">
+            
+            <StackPanel VerticalAlignment="Top"  Margin="0,0,0,0" Grid.Row="1">
+
+                <TextBlock Text="NAME" Margin="0,4,0,2"></TextBlock>
+                <TextBox
+                    VerticalContentAlignment="Center"
+                    Name="environmentName"
+                    Height="30"
+                    MaxLength="50"
+                    Margin="0,2,0,15"
+                    TextChanged="environmentName_TextChanged"></TextBox>
+
+                <TextBlock Text="COPY FROM" Margin="0,4,0,2" ></TextBlock>
+                <ComboBox
+                    VerticalContentAlignment="Center"
+                    Name="copyEnvironmentComboBox"
+                    Height="30"
+                    Margin="0,2,0,15"
+                    DisplayMemberPath="Name"
+                    SelectedValuePath="Id"/>
+
+                <TextBlock Text="DESCRIPTION" Margin="0,4,0,2" ></TextBlock>
+                <TextBox
+                    AcceptsReturn="True"
+                    Name="descriptionTextBox"
+                    Height="80"
+                    Margin="0,2,0,15"
+                    MaxLength="500"></TextBox>
+
+            </StackPanel>
+
+        </Grid>
+
+        <Grid Grid.Row="2">
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Name="okButton" IsEnabled="False" Content="CREATE" Margin="0,0,8,0" Width="70" Height="30" HorizontalAlignment="Right" Click="okButton_Click"></Button>
+                <Button Name="cancelButton" Content="CLOSE" Width="70" Height="30" HorizontalAlignment="Right" Click="cancelButton_Click"></Button>
+            </StackPanel>
+
+        </Grid>
+
+    </Grid>
+</Window>

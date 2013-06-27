@@ -1,0 +1,113 @@
+﻿<Window x:Class="PolymeliaDeployClient.Forms.SelectProject"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Select Project"
+        Height="450"
+        Width="600"
+        Background="White"
+        WindowStyle="None"
+        WindowStartupLocation="CenterOwner"
+        AllowsTransparency="True"
+        ResizeMode="CanResizeWithGrip"
+        Foreground="Black">
+    
+    <Grid Margin="20">
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="60"/>
+        </Grid.RowDefinitions>
+        
+        <Grid Margin="0,0,0,0">
+
+            <StackPanel VerticalAlignment="Center">
+
+                <TextBlock
+                    VerticalAlignment="Center"
+                    FontSize="12"
+                    Foreground="#aaaaaa"
+                    FontWeight="Black"
+                    Margin="0,0,0,8"
+                    Text="OPEN PROJECT"/>
+
+                <TextBlock
+                    Name="selectProjectTextBlock"
+                    VerticalAlignment="Center"
+                    FontSize="20"
+                    Foreground="DarkOrange"
+                    Text="Please wait while loading projects..."/>
+
+            </StackPanel>
+
+        </Grid>
+
+        <Grid Grid.Row="1" Margin="0,20,0,0">
+        
+            <StackPanel 
+                    Grid.Row="1" 
+                    Orientation="Horizontal" HorizontalAlignment="Left">
+
+                <Button
+                       Name="createNew"
+                       Height="30"
+                       Style="{StaticResource linkButtonOnWhiteBg}"
+                       HorizontalAlignment="Left"
+                       Content="NEW" Click="createNew_Click"/>
+
+                <Button
+                       Name="removeProjectButton"
+                       Height="30"
+                       Margin="20,0,0,0"
+                       IsEnabled="false"
+                       HorizontalAlignment="Left"
+                       Style="{StaticResource linkButtonOnWhiteBg}"
+                       Content="DELETE" Click="removeProjectButton_Click"/>
+
+               
+            </StackPanel>
+
+            <Rectangle Height="2" VerticalAlignment="Bottom" Fill="#aaaaaa"></Rectangle>
+
+        </Grid>
+
+        <ListBox
+                Margin="-5,10,0,0"
+                Grid.Row="2"
+                BorderBrush="White"
+                BorderThickness="0"
+                Name="projectsListBox"
+                DisplayMemberPath="Name"
+                Height="230"
+                SelectionChanged="projectsListBox_SelectionChanged" 
+                MouseDoubleClick="projectsListBox_MouseDoubleClick">
+        </ListBox>
+
+
+        <Grid Grid.Row="3">
+
+                <StackPanel Orientation="Horizontal" Margin="8" HorizontalAlignment="Right">
+                    
+                    <Button
+                        Name="okButton"
+                        Margin="0,0,8,0"
+                        Height="30"
+                        Width="70"
+                        IsEnabled="False"
+                        HorizontalAlignment="Right"
+                        Content="OPEN" Click="okButton_Click"/>
+
+                    <Button
+                        Name="cancelButton"
+                        Height="30"
+                        Width="70"
+                        HorizontalAlignment="Right"
+                        Content="CLOSE" Click="cancelButton_Click"/>
+                    
+                </StackPanel>
+
+            </Grid>
+
+    </Grid>
+</Window>
