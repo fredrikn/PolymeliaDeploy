@@ -23,7 +23,7 @@ namespace PolymeliaDeployController
 
             var service = new Service();
 
-            if (args.Any(arg => arg == "/c"))
+            if (Environment.UserInteractive)
             {
                 using (CreateServiceHost())
                 {
