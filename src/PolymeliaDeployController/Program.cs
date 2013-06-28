@@ -23,7 +23,7 @@ namespace PolymeliaDeployController
 
             var service = new Service();
 
-            if (Environment.UserInteractive)
+            if (System.Environment.UserInteractive)
             {
                 using (CreateServiceHost())
                 {
