@@ -8,8 +8,7 @@
     {
         private static string _serverRole = string.Empty;
 
-
-        public static IEnumerable<Variable> Variables { get; internal set; }
+        public static IDictionary<string, string> Variables { get; internal set; }
 
 
         public static string ServerRole
@@ -19,5 +18,9 @@
         }
 
         public static long? CurrentActivityId { get; set; }
+
+        public static long TaskId { get; set; }
+
+        public static string DeployVersion { get; set; }
     }
 }

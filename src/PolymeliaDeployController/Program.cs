@@ -40,7 +40,9 @@ namespace PolymeliaDeployController
 
         internal static IDisposable CreateServiceHost()
         {
-            var localIpAddress = IPAddressRetriever.LocalIPAddress();
+            //var localIpAddress = IPAddressRetriever.LocalIPAddress();
+
+            var localIpAddress = "localhost";
 
             var portNumber = ConfigurationManager.AppSettings["ControllerPort"];
 

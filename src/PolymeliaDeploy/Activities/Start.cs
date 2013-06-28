@@ -15,10 +15,6 @@
 
         private CompletionCallback onChildComplete;
 
-        public InArgument<long> DeployTaskId { get; set; }
-
-        public InArgument<string> DeployTaskVersion { get; set; }
-
 
         [DependsOn("Variables")]
         [Browsable(false)]
@@ -46,13 +42,8 @@
 
         protected override void Execute(NativeActivityContext context)
         {
-            DeployVersion = context.GetValue(DeployTaskVersion);
-            TaskId = context.GetValue(DeployTaskId);
-
             if (this._activities == null || this.Activities.Count <= 0)
                 return;
-
-            AddDeployableVariablesToActivitySupportingIt(Activities, context);
 
             var activity = this.Activities[0];
             context.ScheduleActivity(activity, this.onChildComplete);

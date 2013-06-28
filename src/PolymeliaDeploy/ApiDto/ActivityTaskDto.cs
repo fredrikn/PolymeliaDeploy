@@ -3,6 +3,7 @@
 namespace PolymeliaDeploy.ApiDto
 {
     using PolymeliaDeploy.Data;
+    using System.Collections.Generic;
 
     public class ActivityTaskDto
     {
@@ -21,6 +22,8 @@ namespace PolymeliaDeploy.ApiDto
         public DateTime Created { get; set; }
 
         public string ActivityName { get; set; }
+
+        public IDictionary<string, string> Variables { get; set; }
 
         public ActivityStatus Status { get; set; }
     }

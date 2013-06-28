@@ -7,20 +7,23 @@
     using System.IO;
 
     using PolymeliaDeploy.Data;
+    using PolymeliaDeploy;
 
     internal class WorkflowRunner
     {
         public void Run(MainActivity mainActivity)
         {
-            var parameters = new Dictionary<string, object>
-                                 {
-                                     { "DeployTaskId", mainActivity.Id },
-                                     { "DeployTaskVersion", mainActivity.Version }
-                                 };
+            //var parameters = new Dictionary<string, object>
+            //                     {
+            //                         { "DeployTaskId", mainActivity.Id },
+            //                         { "DeployTaskVersion", mainActivity.Version }
+            //                     };
+
+            AgentEnvironment.TaskId = mainActivity.Id;
+            AgentEnvironment.DeployVersion = mainActivity.Version;
 
             var wf = ActivityXamlServices.Load(new StringReader(mainActivity.DeployActivity));
-
-            var wfApp = new WorkflowApplication(wf, parameters);
+            var wfApp = new WorkflowApplication(wf);
 
             wfApp.Completed = delegate(WorkflowApplicationCompletedEventArgs e)
             {

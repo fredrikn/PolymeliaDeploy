@@ -11,6 +11,7 @@ namespace PolymeliaDeploy.Activities
     using System.Threading;
 
     using PolymeliaDeploy.Data;
+    using PolymeliaDeploy.Workflow;
 
     [Designer("System.Activities.Core.Presentation.SequenceDesigner, System.Activities.Core.Presentation")]
     [DisplayName("Deploy to Agent")]
@@ -48,7 +49,7 @@ namespace PolymeliaDeploy.Activities
         {
             var task = new ActivityTask
                            {
-                                TaskId = TaskId,
+                                TaskId = AgentEnvironment.TaskId,
                                 ServerRole = context.GetValue(this.ServerRole),
                                 ActivityCode = activity,
                                 CreatedBy = Thread.CurrentPrincipal.Identity.Name,
@@ -66,7 +67,7 @@ namespace PolymeliaDeploy.Activities
 
         private Start CreateSequence()
         {
-            var sequence = new Start { DeployVersion = DeployVersion, TaskId = TaskId };
+            var sequence = new Start(); // { DeployVersion = DeployVersion, TaskId = TaskId };
 
             foreach (var activity in Activities)
                 sequence.Activities.Add(activity);
@@ -74,16 +75,16 @@ namespace PolymeliaDeploy.Activities
             foreach (var variable in Variables)
                 sequence.Variables.Add(variable);
 
-            foreach (var deployVariable in DeployVariables)
-            {
-                sequence.Variables.Add(
-                    new Variable<string>
-                        {
-                            Name = deployVariable.Key,
-                            Default =
-                                deployVariable.Value == null ? string.Empty : deployVariable.Value.ToString()
-                        });
-            }
+            //foreach (var deployVariable in DeployVariables)
+            //{
+            //    sequence.Variables.Add(
+            //        new Variable<string>
+            //            {
+            //                Name = deployVariable.Key,
+            //                Default =
+            //                    deployVariable.Value == null ? string.Empty : deployVariable.Value.ToString()
+            //            });
+            //}
 
             return sequence;
         }

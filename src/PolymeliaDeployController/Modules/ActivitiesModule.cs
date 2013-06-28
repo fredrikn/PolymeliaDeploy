@@ -37,7 +37,9 @@
                                                                     t.TaskId == maintask.Id)
                                                         .OrderBy(t => t.Id);
 
-                        var actititiesToRun = activites.Select(a => new ActivityTaskDto
+                        var variablesForEnvironment = GetEnvironmentVariables(db, maintask);
+
+                        var actititiesToRun = activites.ToList().Select(a => new ActivityTaskDto
                                                                    {
                                                                        TaskId = a.TaskId,
                                                                        Id = a.Id,
@@ -47,8 +49,9 @@
                                                                        Created = a.Created,
                                                                        CreatedBy = a.CreatedBy,
                                                                        ServerRole = a.ServerRole,
-                                                                       Status = a.Status
-                                                                   }).ToList();
+                                                                       Status = a.Status,
+                                                                       Variables = variablesForEnvironment
+                                                                   });
 
                         if (!actititiesToRun.Any(a => a.Status == ActivityStatus.Failed || 
                             a.Status == ActivityStatus.Canceled))
@@ -119,6 +122,19 @@
 
                 return this.Response.AsJson(mainActivity.Id);
             };
+        }
+
+
+        private static IDictionary<string, string> GetEnvironmentVariables(PolymeliaDeployDbContext db, MainActivity maintask)
+        {
+            var variables = db.Variables.Where(v => v.EnvironmentId == maintask.EnvironmentId);
+
+            IDictionary<string, string> variablesForEnvironment = new Dictionary<string, string>();
+
+            foreach (var variable in variables)
+                variablesForEnvironment.Add(variable.VariableKey, variable.VariableValue);
+
+            return variablesForEnvironment;
         }
     }
 }

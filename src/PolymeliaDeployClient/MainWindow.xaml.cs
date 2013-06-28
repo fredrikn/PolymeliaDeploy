@@ -319,7 +319,11 @@ namespace PolymeliaDeployClient
             variables.Owner = this;
             variables.EnvironmentId = SelectedEnvironment.Id;
 
+            blockBackgroundGrid.Visibility = Visibility.Visible;
+            
             variables.ShowDialog();
+
+            blockBackgroundGrid.Visibility = Visibility.Hidden;
         }
     }
 }

@@ -107,14 +107,15 @@
             try
             {
                 AgentEnvironment.CurrentActivityId = activityTask.Id;
+                AgentEnvironment.TaskId = activityTask.TaskId;
+                AgentEnvironment.DeployVersion = activityTask.DeployVersion;
+                AgentEnvironment.Variables = activityTask.Variables;
 
-                //_variableClient.GetAllVariables(10);
-
-                var parameters = new Dictionary<string, object>
-                                 {
-                                     { "DeployTaskId", activityTask.TaskId },
-                                     { "DeployTaskVersion", activityTask.DeployVersion }
-                                 };
+                //var parameters = new Dictionary<string, object>
+                //                 {
+                //                     { "DeployTaskId", activityTask.TaskId },
+                //                     { "DeployTaskVersion", activityTask.DeployVersion }
+                //                 };
 
                 var wf = ActivityXamlServices.Load(new StringReader(activityTask.ActivityCode));
                 WorkflowInvoker.Invoke(wf, parameters);
