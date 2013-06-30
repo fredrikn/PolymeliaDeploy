@@ -11,7 +11,7 @@
              BorderThickness="0">
 
     <UserControl.Resources>
-        <sys:String x:Key="AssemblyName">PolymeliaDeploy</sys:String>
+        <sys:String x:Key="AssemblyName">System.Activities, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35</sys:String>
     </UserControl.Resources>
 
     <Grid Name="grid1" Margin="0">
@@ -49,7 +49,33 @@
                 BorderBrush="#dddddd"
                 Foreground="Black"
                 Background="#dddddd">
-                
+
+                <sad:ToolboxCategory CategoryName="Basic">
+                    <sad:ToolboxItemWrapper AssemblyName="{StaticResource AssemblyName}" >
+                        <sad:ToolboxItemWrapper.ToolName>
+                            System.Activities.Statements.Sequence
+                        </sad:ToolboxItemWrapper.ToolName>
+                    </sad:ToolboxItemWrapper>
+                    <sad:ToolboxItemWrapper  AssemblyName="{StaticResource AssemblyName}">
+                        <sad:ToolboxItemWrapper.ToolName>
+                            System.Activities.Statements.WriteLine
+                        </sad:ToolboxItemWrapper.ToolName>
+
+                    </sad:ToolboxItemWrapper>
+                    <sad:ToolboxItemWrapper  AssemblyName="{StaticResource AssemblyName}">
+                        <sad:ToolboxItemWrapper.ToolName>
+                            System.Activities.Statements.If
+                        </sad:ToolboxItemWrapper.ToolName>
+
+                    </sad:ToolboxItemWrapper>
+                    <sad:ToolboxItemWrapper  AssemblyName="{StaticResource AssemblyName}">
+                        <sad:ToolboxItemWrapper.ToolName>
+                            System.Activities.Statements.While
+                        </sad:ToolboxItemWrapper.ToolName>
+
+                    </sad:ToolboxItemWrapper>
+                </sad:ToolboxCategory>
+
                 <sad:ToolboxControl.Resources>
 
                     <Style TargetType="{x:Type sad:ToolboxControl}">

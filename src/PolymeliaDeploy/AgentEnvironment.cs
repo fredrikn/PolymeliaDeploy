@@ -8,7 +8,7 @@
     {
         private static string _serverRole = string.Empty;
 
-        public static IDictionary<string, string> Variables { get; internal set; }
+        public static IDictionary<string, string> Variables { get; set; }
 
 
         public static string ServerRole

@@ -15,6 +15,9 @@ namespace PolymeliaDeployClient.Controls
     using System.Windows;
 
     using PolymeliaDeploy.Activities;
+    using System.Activities.Presentation.Validation;
+    using PolymeliaDeployClient.Workflow;
+    using System.Activities;
 
     /// <summary>
     /// Interaction logic for WorkflowDesignerControl.xaml
@@ -120,6 +123,8 @@ namespace PolymeliaDeployClient.Controls
         private void LoadWorkflowDesigner()
         {        
             _wd = new WorkflowDesigner();
+
+            _wd.Context.Services.Publish<IValidationErrorService>(new DebugValidationErrorService());
 
             (new DesignerMetadata()).Register();
 

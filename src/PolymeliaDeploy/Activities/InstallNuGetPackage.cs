@@ -132,21 +132,23 @@
 
         private Dictionary<string, object> CreatePowerShellScriptVariables(NativeActivityContext context)
         {
-            var variables = new Dictionary<string, object>(DeployVariables)
-                                {
-                                    { "PolymeliaVersion", Version },
-                                    { "PolymeliaEnvironment", context.GetValue(this.ConfigurationEnvironment) },
-                                    { "PolymeliaMachineName", System.Environment.MachineName },
-                                    { "PolymeliaTaskId", TaskId },
-                                    { "PolymeliaDestinationPath", _destinationFolder },
-                                    { "PolymeliaPackageName", context.GetValue(PackageName) },
-                                    { "PolymeliaPackageVersion", _packageVersion }
-                                };
+            //var variables = new Dictionary<string, object>(DeployVariables)
+            //                    {
+            //                        { "PolymeliaVersion", Version },
+            //                        { "PolymeliaEnvironment", context.GetValue(this.ConfigurationEnvironment) },
+            //                        { "PolymeliaMachineName", System.Environment.MachineName },
+            //                        { "PolymeliaTaskId", TaskId },
+            //                        { "PolymeliaDestinationPath", _destinationFolder },
+            //                        { "PolymeliaPackageName", context.GetValue(PackageName) },
+            //                        { "PolymeliaPackageVersion", _packageVersion }
+            //                    };
 
-            foreach (var variable in this.Variables)
-                variables.Add(variable.Name, variable.Default);
+            //foreach (var variable in this.Variables)
+            //    variables.Add(variable.Name, variable.Default);
 
-            return variables;
+            //return variables;
+
+            return null;
         }
 
         private void DecompressAndRemovePacakgeFile(string fileToUnzip)
@@ -341,25 +343,25 @@
             if (xmlNodeList == null)
                 return;
 
-            foreach (XmlElement node in xmlNodeList)
-            {
-                foreach (var variable in this.DeployVariables)
-                {
-                    if (node.Attributes[attributeNameToFind].Value.ToLower() != variable.Key.ToLower())
-                        continue;
+            //foreach (XmlElement node in xmlNodeList)
+            //{
+            //    foreach (var variable in this.DeployVariables)
+            //    {
+            //        if (node.Attributes[attributeNameToFind].Value.ToLower() != variable.Key.ToLower())
+            //            continue;
 
-                    node.SetAttribute(attributeNameToChange, variable.Value.ToString());
+            //        node.SetAttribute(attributeNameToChange, variable.Value.ToString());
 
-                    this.LogInformation("Changed the '{0}' attribute of the '{1}' with the attribute {2} to value '{3}'", attributeNameToChange, path, attributeNameToFind, variable.Value);
-                }
-            }
+            //        this.LogInformation("Changed the '{0}' attribute of the '{1}' with the attribute {2} to value '{3}'", attributeNameToChange, path, attributeNameToFind, variable.Value);
+            //    }
+            //}
         }
 
         private async void LogInformation(string message, params object[] arguments)
         {
             var msg = string.Format(message, arguments);
 
-            await reportRemoteClient.Report(TaskId, AgentEnvironment.ServerRole, msg, DisplayName);
+            await reportRemoteClient.Report(AgentEnvironment.TaskId, AgentEnvironment.ServerRole, msg, DisplayName);
 
             Console.WriteLine(msg);
         }
@@ -369,7 +371,7 @@
         {
             var msg = string.Format(message, arguments);
 
-            await reportRemoteClient.Report(TaskId, AgentEnvironment.ServerRole , msg, DisplayName, ReportStatus.Error);
+            await reportRemoteClient.Report(AgentEnvironment.TaskId, AgentEnvironment.ServerRole, msg, DisplayName, ReportStatus.Error);
 
             Console.WriteLine(msg);
         }

@@ -19,7 +19,7 @@ namespace PolymeliaDeployAgent
             DeployServices.ReportClient = new ReportRemoteClient();
             DeployServices.ActivityClient = new ActivityRemoteClient();
 
-            if (args.Any(arg => arg == "/c"))
+            if (System.Environment.UserInteractive)
             {
                 Console.WriteLine("Start polling deploy controller for tasks...");
                 

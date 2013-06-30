@@ -88,9 +88,7 @@
     <Compile Include="Activities\CreateMsmqQueue.cs" />
     <Compile Include="Activities\Start.cs" />
     <Compile Include="Activities\InstallNuGetPackage.cs" />
-    <Compile Include="Activities\Parallel.cs" />
     <Compile Include="Activities\PolymeliaNativiveActivity.cs" />
-    <Compile Include="Activities\Sequence.cs" />
     <Compile Include="Activities\PullDeployAgentSequence.cs" />
     <Compile Include="Workflow\IgnorableXamlXmlWriter.cs" />
     <Compile Include="Activities\VirtualMachine.cs" />

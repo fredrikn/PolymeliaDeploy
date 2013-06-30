@@ -118,7 +118,7 @@
                 //                 };
 
                 var wf = ActivityXamlServices.Load(new StringReader(activityTask.ActivityCode));
-                WorkflowInvoker.Invoke(wf, parameters);
+                WorkflowInvoker.Invoke(wf);
 
                 activityTask.Status = ActivityStatus.Completed;
 
