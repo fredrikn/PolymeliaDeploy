@@ -56,24 +56,25 @@
                             System.Activities.Statements.Sequence
                         </sad:ToolboxItemWrapper.ToolName>
                     </sad:ToolboxItemWrapper>
+                    
                     <sad:ToolboxItemWrapper  AssemblyName="{StaticResource AssemblyName}">
                         <sad:ToolboxItemWrapper.ToolName>
-                            System.Activities.Statements.WriteLine
+                            System.Activities.Statements.Parallel
                         </sad:ToolboxItemWrapper.ToolName>
-
                     </sad:ToolboxItemWrapper>
-                    <sad:ToolboxItemWrapper  AssemblyName="{StaticResource AssemblyName}">
+                    
+                    <!--<sad:ToolboxItemWrapper  AssemblyName="{StaticResource AssemblyName}">
                         <sad:ToolboxItemWrapper.ToolName>
                             System.Activities.Statements.If
                         </sad:ToolboxItemWrapper.ToolName>
-
                     </sad:ToolboxItemWrapper>
+                    
                     <sad:ToolboxItemWrapper  AssemblyName="{StaticResource AssemblyName}">
                         <sad:ToolboxItemWrapper.ToolName>
                             System.Activities.Statements.While
                         </sad:ToolboxItemWrapper.ToolName>
-
-                    </sad:ToolboxItemWrapper>
+                    </sad:ToolboxItemWrapper>-->
+                    
                 </sad:ToolboxCategory>
 
                 <sad:ToolboxControl.Resources>

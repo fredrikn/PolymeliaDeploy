@@ -53,7 +53,19 @@ namespace PolymeliaDeployClient.Controls
 
             CreateToolBox(assemblies);
 
-            Loaded += (sender, args) => LoadWorkflowDesigner();
+            Loaded += (sender, args) =>
+                {
+                    try
+                    {
+                        LoadWorkflowDesigner();
+                    }
+                    catch(Exception e)
+                    {
+                        MessageBox.Show(
+                            string.Format("Error while loading Workflow designer, error: {0}", e.Message),
+                            "Error while loading desinger");
+                    }
+                };
         }
 
 

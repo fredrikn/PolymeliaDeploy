@@ -132,6 +132,8 @@
 
         private Dictionary<string, object> CreatePowerShellScriptVariables(NativeActivityContext context)
         {
+            //TODO: Add varaibles, using the AgentEnvironment
+
             //var variables = new Dictionary<string, object>(DeployVariables)
             //                    {
             //                        { "PolymeliaVersion", Version },
@@ -148,7 +150,7 @@
 
             //return variables;
 
-            return null;
+            return new Dictionary<string, object>();
         }
 
         private void DecompressAndRemovePacakgeFile(string fileToUnzip)
