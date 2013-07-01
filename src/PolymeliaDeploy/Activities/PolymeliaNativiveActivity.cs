@@ -66,8 +66,8 @@
                 return;
 
             reportRemoteClient.Report(
-                                      AgentEnvironment.TaskId,
-                                      AgentEnvironment.ServerRole,
+                                      AgentEnvironment.Current.TaskId,
+                                      AgentEnvironment.Current.ServerRole,
                                       msg,
                                       DisplayName,
                                       status);

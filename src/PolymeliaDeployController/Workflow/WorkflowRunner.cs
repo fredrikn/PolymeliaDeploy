@@ -19,8 +19,8 @@
             //                         { "DeployTaskVersion", mainActivity.Version }
             //                     };
 
-            AgentEnvironment.TaskId = mainActivity.Id;
-            AgentEnvironment.DeployVersion = mainActivity.Version;
+            AgentEnvironment.Current.TaskId = mainActivity.Id;
+            AgentEnvironment.Current.DeployVersion = mainActivity.Version;
 
             var wf = ActivityXamlServices.Load(new StringReader(mainActivity.DeployActivity));
             var wfApp = new WorkflowApplication(wf);

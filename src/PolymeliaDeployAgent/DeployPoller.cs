@@ -107,11 +107,12 @@ namespace PolymeliaDeploy.Agent
         {
             try
             {
-                AgentEnvironment.CurrentActivityId = activityTask.Id;
-                AgentEnvironment.TaskId = activityTask.TaskId;
-                AgentEnvironment.DeployVersion = activityTask.DeployVersion;
-                AgentEnvironment.Variables = activityTask.Variables;
-                AgentEnvironment.ServerRole = ServerRoleName;
+                var agentEnvironment = AgentEnvironment.Current;
+                agentEnvironment.CurrentActivityId = activityTask.Id;
+                agentEnvironment.TaskId = activityTask.TaskId;
+                agentEnvironment.DeployVersion = activityTask.DeployVersion;
+                agentEnvironment.Variables = activityTask.Variables;
+                agentEnvironment.ServerRole = ServerRoleName;
 
                 //var parameters = new Dictionary<string, object>
                 //                 {
