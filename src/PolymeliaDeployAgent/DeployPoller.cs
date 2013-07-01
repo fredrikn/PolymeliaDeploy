@@ -2,7 +2,6 @@
 using System.Activities;
 using System.Activities.XamlIntegration;
 using System.Collections.Generic;
-using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -18,8 +17,7 @@ namespace PolymeliaDeploy.Agent
         private readonly IReportClient _reportClient;
         private readonly IActivityClient _activityClient;
         private readonly IVariableClient _variableClient;
-
-        private const string LAST_TASK_FILE = "lastTask.dat";
+        private readonly IRecordLatestTask _latestTask;
 
         private CancellationTokenSource cancellationTokenSource;
 
@@ -29,11 +27,17 @@ namespace PolymeliaDeploy.Agent
         public DeployPoller(
             IReportClient reportClient,
             IActivityClient activityClient,
-            IVariableClient variableClient)
+            IVariableClient variableClient,
+            IRecordLatestTask latestTask)
         {
+            if (reportClient == null) throw new ArgumentNullException("reportClient");
+            if (activityClient == null) throw new ArgumentNullException("activityClient");
+            if (variableClient == null) throw new ArgumentNullException("variableClient");
+            if (latestTask == null) throw new ArgumentNullException("latestTask");
             _reportClient = reportClient;
             _activityClient = activityClient;
             _variableClient = variableClient;
+            _latestTask = latestTask;
         }
 
         public string ServerRoleName { get; set; }
@@ -51,7 +55,7 @@ namespace PolymeliaDeploy.Agent
             {
                 while (!cancellationToken.IsCancellationRequested)
                 {
-                    var latestTaskRunId = GetLatestCompletedTask();
+                    var latestTaskRunId = _latestTask.GetValue();
 
                     var tasks = _activityClient.GetActivityTasksFromDeployController(latestTaskRunId, ServerRoleName).ToArray();
 
@@ -93,15 +97,8 @@ namespace PolymeliaDeploy.Agent
             }
 
             if (latestTaskRunId != lastExecutedTaskId)
-                UpdateLastExecutedTaskId(lastExecutedTaskId);
+                _latestTask.SetValue(lastExecutedTaskId);
         }
-
-
-        private static void UpdateLastExecutedTaskId(long lastExecutedTaskId)
-        {
-            File.WriteAllText(LAST_TASK_FILE, lastExecutedTaskId.ToString());
-        }
-
 
         private bool ExecuteTask(ActivityTaskDto activityTask)
         {
@@ -158,19 +155,6 @@ namespace PolymeliaDeploy.Agent
                 return ActivityXamlServices.Load(reader);
         }
 
-        private long GetLatestCompletedTask()
-        {
-            if (!File.Exists(LAST_TASK_FILE))
-                return 0;
-
-            var taskId = File.ReadAllText(LAST_TASK_FILE);
-
-            long latestTaskId = 0;
-
-            return long.TryParse(taskId, out latestTaskId) ? latestTaskId : 0;
-        }
-
-
         public void Dispose()
         {
             if (_isDesposed)
@@ -180,8 +164,8 @@ namespace PolymeliaDeploy.Agent
 
             _isRunning = false;
             _isDesposed = true;
-            this._reportClient.Dispose();
-            this._activityClient.Dispose();
+            _reportClient.Dispose();
+            _activityClient.Dispose();
         }
     }
 }

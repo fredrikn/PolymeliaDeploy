@@ -45,11 +45,12 @@ namespace PolymeliaDeploy.Agent
             var reportClient = new ReportRemoteClient();
             var activityClient = new ActivityRemoteClient();
             var variableClient = new VariableRemoteClient();
+            var latestTask = new FileRecordLatestTask("lastTask.dat");
 
             DeployServices.ReportClient = reportClient;
             DeployServices.ActivityClient = activityClient;
 
-            return new DeployPoller(reportClient, activityClient, variableClient)
+            return new DeployPoller(reportClient, activityClient, variableClient, latestTask)
                 {
                     PollerInterval = TimeSpan.FromSeconds(ConfigurationHelper.GetInt32("TaskPollerTime", @default: 1)),
                     ServerRoleName = ConfigurationHelper.GetString("ServerRoleName")
