@@ -119,8 +119,7 @@ namespace PolymeliaDeploy.Agent
                 //                     { "DeployTaskVersion", activityTask.DeployVersion }
                 //                 };
 
-                var wf = ActivityXamlServices.Load(new StringReader(activityTask.ActivityCode));
-                WorkflowInvoker.Invoke(wf);
+                WorkflowInvoker.Invoke(LoadActivity(activityTask));
 
                 activityTask.Status = ActivityStatus.Completed;
 
@@ -153,6 +152,11 @@ namespace PolymeliaDeploy.Agent
             }
         }
 
+        private static Activity LoadActivity(ActivityTaskDto activityTask)
+        {
+            using (var reader = new StringReader(activityTask.ActivityCode))
+                return ActivityXamlServices.Load(reader);
+        }
 
         private long GetLatestCompletedTask()
         {
