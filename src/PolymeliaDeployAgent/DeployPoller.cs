@@ -53,7 +53,7 @@ namespace PolymeliaDeploy.Agent
                 {
                     var latestTaskRunId = GetLatestCompletedTask();
 
-                    var tasks = _activityClient.GetActivityTasksFromDeployController(latestTaskRunId, ServerRoleName);
+                    var tasks = _activityClient.GetActivityTasksFromDeployController(latestTaskRunId, ServerRoleName).ToArray();
 
                     if (tasks.Any())
                         ExecuteTasks(latestTaskRunId, tasks);
