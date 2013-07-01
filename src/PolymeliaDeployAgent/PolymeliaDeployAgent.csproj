@@ -8,7 +8,7 @@
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>PolymeliaDeploy.Agent</RootNamespace>
-    <AssemblyName>PolymeliaDeploy.Agent</AssemblyName>
+    <AssemblyName>PolymeliaDeployAgent</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />

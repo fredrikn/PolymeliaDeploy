@@ -15,9 +15,9 @@ namespace PolymeliaDeploy.Agent
 {
     public class DeployPoller : IDisposable
     {
-        IReportClient _reportClient;
-        IActivityClient _activityClient;
-        IVariableClient _variableClient;
+        private readonly IReportClient _reportClient;
+        private readonly IActivityClient _activityClient;
+        private readonly IVariableClient _variableClient;
 
         private const string LAST_TASK_FILE = "lastTask.dat";
 
@@ -26,15 +26,18 @@ namespace PolymeliaDeploy.Agent
         private bool _isRunning = false;
         private bool _isDesposed = false;
 
-        public DeployPoller()
+        public DeployPoller(
+            IReportClient reportClient,
+            IActivityClient activityClient,
+            IVariableClient variableClient)
         {
-            _reportClient = new ReportRemoteClient();
-            _activityClient = new ActivityRemoteClient();
-            _variableClient = new VariableRemoteClient();
-
-            AgentEnvironment.ServerRole = ConfigurationManager.AppSettings["ServerRoleName"];
+            _reportClient = reportClient;
+            _activityClient = activityClient;
+            _variableClient = variableClient;
         }
 
+        public string ServerRoleName { get; set; }
+        public TimeSpan PollerInterval { get; set; }
 
         public void StartPoll()
         {
@@ -50,12 +53,12 @@ namespace PolymeliaDeploy.Agent
                 {
                     var latestTaskRunId = GetLatestCompletedTask();
 
-                    var tasks = _activityClient.GetActivityTasksFromDeployController(latestTaskRunId, AgentEnvironment.ServerRole);
+                    var tasks = _activityClient.GetActivityTasksFromDeployController(latestTaskRunId, ServerRoleName);
 
                     if (tasks.Any())
                         ExecuteTasks(latestTaskRunId, tasks);
 
-                    await Task.Delay(GetTaskPollerTimeInSeconds(), cancellationToken);
+                    await Task.Delay(PollerInterval, cancellationToken);
                 }
             }, cancellationToken);
         }
@@ -108,6 +111,7 @@ namespace PolymeliaDeploy.Agent
                 AgentEnvironment.TaskId = activityTask.TaskId;
                 AgentEnvironment.DeployVersion = activityTask.DeployVersion;
                 AgentEnvironment.Variables = activityTask.Variables;
+                AgentEnvironment.ServerRole = ServerRoleName;
 
                 //var parameters = new Dictionary<string, object>
                 //                 {
@@ -147,20 +151,6 @@ namespace PolymeliaDeploy.Agent
 
                 return false;
             }
-        }
-
-
-        private int GetTaskPollerTimeInSeconds()
-        {
-            var taskPollerTime = ConfigurationManager.AppSettings["TaskPollerTime"];
-
-            var result = 0;
-
-            if (int.TryParse(taskPollerTime, out result))
-                return result * 1000;
-
-            return 1000;
-
         }
 
 
