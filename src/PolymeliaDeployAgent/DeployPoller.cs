@@ -19,10 +19,9 @@ namespace PolymeliaDeploy.Agent
         private readonly IVariableClient _variableClient;
         private readonly IRecordLatestTask _latestTask;
 
-        private CancellationTokenSource cancellationTokenSource;
-
-        private bool _isRunning = false;
-        private bool _isDesposed = false;
+        private CancellationTokenSource _cancellationTokenSource;
+        private bool _isRunning;
+        private bool _isDesposed;
 
         public DeployPoller(
             IReportClient reportClient,
@@ -48,8 +47,8 @@ namespace PolymeliaDeploy.Agent
             if (_isRunning)
                 return;
 
-            cancellationTokenSource = new CancellationTokenSource();
-            var cancellationToken = cancellationTokenSource.Token;
+            _cancellationTokenSource = new CancellationTokenSource();
+            var cancellationToken = _cancellationTokenSource.Token;
             
             Task.Factory.StartNew(async Delegate =>
             {
@@ -70,7 +69,7 @@ namespace PolymeliaDeploy.Agent
 
         public void StopPoll()
         {
-            cancellationTokenSource.Cancel();
+            _cancellationTokenSource.Cancel();
             _isRunning = false;
         }
 
