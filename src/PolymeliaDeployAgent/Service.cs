@@ -1,13 +1,16 @@
-﻿using System.ServiceProcess;
+﻿using System;
+using System.ServiceProcess;
 
 namespace PolymeliaDeployAgent
 {
     public partial class Service : ServiceBase
     {
-        DeployPoller _deployPoller = new DeployPoller();
+        private readonly DeployPoller _deployPoller;
 
-        public Service()
+        public Service(DeployPoller deployPoller)
         {
+            if (deployPoller == null) throw new ArgumentNullException("deployPoller");
+            _deployPoller = deployPoller;
             InitializeComponent();
         }
 
