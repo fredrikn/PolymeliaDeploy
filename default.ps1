@@ -43,6 +43,9 @@ param(
 	} else {
 		$fileName = [System.IO.Path]::GetFileNameWithoutExtension($InputFile)
 		$options += "/result=.\TestResults\${fileName}.xml"
+		if (-not [System.IO.Directory]::Exists(".\TestResults")) {
+			[System.IO.Directory]::CreateDirectory(".\TestResults")
+		}
 	}
 	if ($Include) {
 		$options += ("/include=" + [string]::Join(",", $Include))
