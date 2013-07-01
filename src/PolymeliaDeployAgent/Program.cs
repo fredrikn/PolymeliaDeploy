@@ -1,11 +1,9 @@
 ﻿using System;
 using System.ServiceProcess;
+using PolymeliaDeploy.Controller;
 
-namespace PolymeliaDeployAgent
+namespace PolymeliaDeploy.Agent
 {
-    using PolymeliaDeploy;
-    using PolymeliaDeploy.Controller;
-
     internal static class Program
     {
         private static void Main()

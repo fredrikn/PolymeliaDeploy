@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ServiceProcess;
 
-namespace PolymeliaDeployAgent
+namespace PolymeliaDeploy.Agent
 {
     public partial class Service : ServiceBase
     {

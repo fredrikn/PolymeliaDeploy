@@ -1,4 +1,4 @@
-﻿namespace PolymeliaDeployAgent
+﻿namespace PolymeliaDeploy.Agent
 {
     partial class Service
     {

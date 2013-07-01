@@ -7,8 +7,8 @@
     <ProjectGuid>{50D26AE4-CCD5-447D-9ABA-F07FE7716041}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>PolymeliaDeployAgent</RootNamespace>
-    <AssemblyName>PolymeliaDeployAgent</AssemblyName>
+    <RootNamespace>PolymeliaDeploy.Agent</RootNamespace>
+    <AssemblyName>PolymeliaDeploy.Agent</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />

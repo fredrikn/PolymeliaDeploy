@@ -1,20 +1,18 @@
-﻿namespace PolymeliaDeployAgent
+﻿using System;
+using System.Activities;
+using System.Activities.XamlIntegration;
+using System.Collections.Generic;
+using System.Configuration;
+using System.IO;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using PolymeliaDeploy.ApiDto;
+using PolymeliaDeploy.Controller;
+using PolymeliaDeploy.Data;
+
+namespace PolymeliaDeploy.Agent
 {
-    using System;
-    using System.Activities;
-    using System.Activities.XamlIntegration;
-    using System.Collections.Generic;
-    using System.Configuration;
-    using System.IO;
-    using System.Linq;
-    using System.Threading;
-    using System.Threading.Tasks;
-
-    using PolymeliaDeploy;
-    using PolymeliaDeploy.ApiDto;
-    using PolymeliaDeploy.Controller;
-    using PolymeliaDeploy.Data;
-
     public class DeployPoller : IDisposable
     {
         IReportClient _reportClient;
