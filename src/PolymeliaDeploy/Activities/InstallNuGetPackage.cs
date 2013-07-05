@@ -363,7 +363,7 @@
         {
             var msg = string.Format(message, arguments);
 
-            await reportRemoteClient.Report(AgentEnvironment.TaskId, AgentEnvironment.ServerRole, msg, DisplayName);
+            await reportRemoteClient.Report(AgentEnvironment.Current.TaskId, AgentEnvironment.Current.ServerRole, msg, DisplayName);
 
             Console.WriteLine(msg);
         }
@@ -373,7 +373,7 @@
         {
             var msg = string.Format(message, arguments);
 
-            await reportRemoteClient.Report(AgentEnvironment.TaskId, AgentEnvironment.ServerRole, msg, DisplayName, ReportStatus.Error);
+            await reportRemoteClient.Report(AgentEnvironment.Current.TaskId, AgentEnvironment.Current.ServerRole, msg, DisplayName, ReportStatus.Error);
 
             Console.WriteLine(msg);
         }
