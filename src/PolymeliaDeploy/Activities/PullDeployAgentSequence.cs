@@ -49,7 +49,7 @@ namespace PolymeliaDeploy.Activities
         {
             var task = new ActivityTask
                            {
-                                TaskId = AgentEnvironment.TaskId,
+                                TaskId = AgentEnvironment.Current.TaskId,
                                 ServerRole = context.GetValue(this.ServerRole),
                                 ActivityCode = activity,
                                 CreatedBy = Thread.CurrentPrincipal.Identity.Name,
