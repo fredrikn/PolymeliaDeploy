@@ -14,6 +14,11 @@ namespace PolymeliaDeploy.Data
 
     public class ActivityReport
     {
+        public ActivityReport()
+        {
+            LocalCreated = DateTime.Now;
+        }
+
         public long Id { get; set; }
 
         public long TaskId { get; set; }

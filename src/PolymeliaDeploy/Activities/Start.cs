@@ -15,6 +15,12 @@
 
         private CompletionCallback onChildComplete;
 
+        [Browsable(false)]
+        public InArgument<long> DeployTaskId { get; set; }
+
+        [Browsable(false)]
+        public InArgument<string> DeployTaskVersion { get; set; }
+
 
         [DependsOn("Variables")]
         [Browsable(false)]
@@ -42,6 +48,9 @@
 
         protected override void Execute(NativeActivityContext context)
         {
+            AgentEnvironment.Current.TaskId = DeployTaskId.Get(context);
+            AgentEnvironment.Current.DeployVersion = DeployTaskVersion.Get(context);
+
             if (this._activities == null || this.Activities.Count <= 0)
                 return;
 

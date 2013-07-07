@@ -43,6 +43,9 @@
     <Reference Include="EntityFramework">
       <HintPath>..\packages\EntityFramework.5.0.0\lib\net45\EntityFramework.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.AspNet.SignalR.Client">
+      <HintPath>..\packages\Microsoft.AspNet.SignalR.Client.1.1.2\lib\net45\Microsoft.AspNet.SignalR.Client.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\packages\Newtonsoft.Json.4.5.11\lib\net40\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -61,8 +64,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DeployPoller.cs" />
+    <Compile Include="Activity\ITaskActivityExecutioner.cs" />
+    <Compile Include="Activity\TaskActivityExecutioner.cs" />
+    <Compile Include="AgentService.cs" />
+    <Compile Include="Configuration\AgentConfigurationSettings.cs" />
+    <Compile Include="Configuration\IAgentConfigurationSettings.cs" />
+    <Compile Include="DeployControllerClient.cs" />
     <Compile Include="FileRecordLatestTask.cs" />
+    <Compile Include="IAgentService.cs" />
     <Compile Include="IRecordLatestTask.cs" />
     <Compile Include="Service.cs">
       <SubType>Component</SubType>

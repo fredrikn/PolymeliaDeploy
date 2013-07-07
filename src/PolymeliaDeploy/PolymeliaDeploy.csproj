@@ -90,9 +90,10 @@
     <Compile Include="Activities\InstallNuGetPackage.cs" />
     <Compile Include="Activities\PolymeliaNativiveActivity.cs" />
     <Compile Include="Activities\PullDeployAgentSequence.cs" />
+    <Compile Include="DeployController\IDeployControllerClient.cs" />
+    <Compile Include="Workflow\PolymeliaTrackingParticipant.cs" />
     <Compile Include="Workflow\IgnorableXamlXmlWriter.cs" />
     <Compile Include="Activities\VirtualMachine.cs" />
-    <Compile Include="ActivityContext.cs" />
     <Compile Include="AgentEnvironment.cs" />
     <Compile Include="ApiDto\ActivityTaskDto.cs" />
     <Compile Include="Controller\IVariableClient.cs" />

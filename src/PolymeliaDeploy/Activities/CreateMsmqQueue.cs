@@ -24,17 +24,17 @@ namespace PolymeliaDeploy.Activities
 
         protected override void Execute(NativeActivityContext context)
         {
-            ReportInfo(string.Format("Start creating queue '{0}'", context.GetValue(QueueName)));
+            ReportInfo(string.Format("Start creating queue '{0}'", context.GetValue(QueueName)), context);
 
             if (!MessageQueue.Exists(context.GetValue(QueueName)))
             {
                 CreateQueue(context);
 
-                ReportInfo(string.Format("Succeeded to creat queue '{0}'", context.GetValue(QueueName)));
+                ReportInfo(string.Format("Succeeded to creat queue '{0}'", context.GetValue(QueueName)), context);
             }
             else
             {
-                ReportInfo(string.Format("Queue '{0}' already exists", context.GetValue(QueueName)));
+                ReportInfo(string.Format("Queue '{0}' already exists", context.GetValue(QueueName)), context);
             }
         }
 

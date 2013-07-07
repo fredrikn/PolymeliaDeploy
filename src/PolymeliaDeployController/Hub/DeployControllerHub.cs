@@ -1,0 +1,147 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Microsoft.AspNet.SignalR;
+using PolymeliaDeploy.ApiDto;
+using PolymeliaDeploy.Data;
+
+namespace PolymeliaDeployController.Hub
+{
+    public class DeployControllerHub : Microsoft.AspNet.SignalR.Hub
+    {
+        private IDictionary<string, string> _connectedAgents = new Dictionary<string, string>();
+        
+        public void SendMessage(string message)
+        {
+            Console.WriteLine(string.Format("{0}: {1}", GetAgentIpAddress(), message));
+            string it = new string(message.Reverse().ToArray());
+            Clients.All.broadCastToClients(it);
+        }
+
+
+        public async Task Report(ActivityReport report)
+        {
+            await Task.Run( () =>
+            {
+                using (var db = new PolymeliaDeployDbContext())
+                {
+                    db.ActivityReports.Add(report);
+                    db.SaveChanges();
+                }
+            });
+        }
+
+
+        public async Task UpdateActivityTaskStatus(long activityTaskId, ActivityStatus status)
+        {
+            await Task.Run(() =>
+            {
+                using (var db = new PolymeliaDeployDbContext())
+                {
+                    var activityTask = db.ActivityTasks.SingleOrDefault(t => t.Id == activityTaskId);
+
+                    activityTask.Status = status;
+
+                    if (status == ActivityStatus.Failed)
+                    {
+                        var mainActivity = db.MainActivities.SingleOrDefault(t => t.Id == activityTask.TaskId);
+                        mainActivity.Status = ActivityStatus.Failed;
+                    }
+
+                    db.SaveChanges();
+                }
+            });
+        }
+
+
+        public IEnumerable<ActivityTaskDto> GetActivityTasks(int lastTaskId, string serverRole)
+        {
+            using (var db = new PolymeliaDeployDbContext())
+            {
+                var maintask = db.MainActivities.Where(t => t.Id > lastTaskId &&
+                                                      (t.Status != ActivityStatus.Failed ||
+                                                       t.Status != ActivityStatus.Canceled))
+                                                .OrderByDescending(t => t.Id)
+                                                .FirstOrDefault();
+
+                if (maintask != null)
+                {
+                    var activites = db.ActivityTasks.Where(t => t.ServerRole == serverRole &&
+                                                                t.TaskId == maintask.Id)
+                                                    .OrderBy(t => t.Id);
+
+                    //var variablesForEnvironment = GetEnvironmentVariables(db, maintask);
+
+                    var actititiesToRun = activites.ToList().Select(a => new ActivityTaskDto
+                    {
+                        TaskId = a.TaskId,
+                        Id = a.Id,
+                        ActivityCode = a.ActivityCode,
+                        ActivityName = a.ActivityName,
+                        DeployVersion = maintask.Version,
+                        Created = a.Created,
+                        CreatedBy = a.CreatedBy,
+                        ServerRole = a.ServerRole,
+                        Status = a.Status,
+                        //Variables = variablesForEnvironment
+                    });
+
+                    if (!actititiesToRun.Any(a => a.Status == ActivityStatus.Failed ||
+                        a.Status == ActivityStatus.Canceled))
+                        return actititiesToRun;
+                }
+
+                return new List<ActivityTaskDto>();
+            }
+        }
+
+
+        //TODO: Add some sort of key/certificate, authentication
+        public void Connect(string roleName, string environment)
+        {
+            Console.WriteLine(string.Format("Agent from IP: '{0}' with role: '{1}' for environment: '{2}' is now connected", GetAgentIpAddress(), roleName, environment));
+
+            //TODO: Make sure to register connected agent.
+
+            var agentId = string.Format("{0}_{1}", roleName, environment);
+            
+            if (!_connectedAgents.ContainsKey(agentId))
+                _connectedAgents.Add(agentId, Context.ConnectionId);
+        }
+
+
+
+        public override Task OnDisconnected()
+        {
+            var agentKey = _connectedAgents.Where(a => a.Value == Context.ConnectionId)
+                                           .Select( a => a.Key).FirstOrDefault();
+
+            if (agentKey != null)
+                _connectedAgents.Remove(agentKey);
+
+            //TODO: Add the agent that was disconnected
+            Console.WriteLine(string.Format("An Agent is now disconnected", GetAgentIpAddress()));
+
+            return base.OnDisconnected();
+        }
+
+
+
+
+        protected string GetAgentIpAddress()
+        {
+            var env = Get<IDictionary<string, object>>(Context.Request.Items, "owin.environment");
+            if (env == null) return null;
+
+            return Get<string>(env, "server.RemoteIpAddress");
+        }
+
+        private static T Get<T>(IDictionary<string, object> env, string key)
+        {
+            object value;
+            return env.TryGetValue(key, out value) ? (T)value : default(T);
+        }
+    }
+}

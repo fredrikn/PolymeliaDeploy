@@ -3,6 +3,10 @@ using System.Configuration;
 using System.Globalization;
 using System.ServiceProcess;
 using PolymeliaDeploy.Controller;
+using Microsoft.AspNet.SignalR.Client.Hubs;
+using PolymeliaDeploy.Agent.Configuration;
+using System.Threading.Tasks;
+using PolymeliaDeploy.Agent.Activity;
 
 namespace PolymeliaDeploy.Agent
 {
@@ -10,71 +14,47 @@ namespace PolymeliaDeploy.Agent
     {
         private static void Main()
         {
-            using (var poller = NewPoller())
+            using (var agentService = CreateAgentService())
             {
                 if (Environment.UserInteractive)
-                {
-                    RunInConsole(poller);
-                }
+                    RunInConsole(agentService);
                 else
-                {
-                    RunAsService(poller);
-                }
+                    RunAsService(agentService);
             }
         }
 
-        private static void RunInConsole(DeployPoller poller)
+
+        private static AgentService CreateAgentService()
         {
-            Console.WriteLine("Start polling deploy controller for tasks...");
-            poller.StartPoll();
+            var agentConfig = new AgentConfigurationSettings();
+            var deployControllerClient = new DeployControllerClient();
+            var recordLastTaskId = new FileRecordLatestTask("lasttaskid.dat");
+            var taskExecutioner = new TaskActivityExecutioner();
+
+            return new AgentService(
+                                    deployControllerClient,
+                                    agentConfig,
+                                    taskExecutioner,
+                                    recordLastTaskId);
+        }
+
+
+        private static void RunInConsole(IAgentService agentService)
+        {
+            Console.WriteLine("Connect to DeployController");
+
+            agentService.Start();
+
             Console.WriteLine("Press any key to exit");
+
             Console.ReadKey();
         }
 
-        private static void RunAsService(DeployPoller poller)
+
+        private static void RunAsService(IAgentService agentService)
         {
-            using (var service = new Service(poller))
-            {
+            using (var service = new Service(agentService))
                 ServiceBase.Run(service);
-            }
-        }
-
-        private static DeployPoller NewPoller()
-        {
-            // TODO: Dependency injection!
-            var reportClient = new ReportRemoteClient();
-            var activityClient = new ActivityRemoteClient();
-            var variableClient = new VariableRemoteClient();
-            var latestTask = new FileRecordLatestTask("lastTask.dat");
-
-            DeployServices.ReportClient = reportClient;
-            DeployServices.ActivityClient = activityClient;
-
-            return new DeployPoller(reportClient, activityClient, variableClient, latestTask)
-                {
-                    PollerInterval = TimeSpan.FromSeconds(ConfigurationHelper.GetInt32("TaskPollerTime", @default: 1)),
-                    ServerRoleName = ConfigurationHelper.GetString("ServerRoleName")
-                };
-        }
-
-        private static class ConfigurationHelper
-        {
-            public static int GetInt32(string key, int @default = 0)
-            {
-                var value = GetString(key);
-                if (value == null) return @default;
-
-                int result;
-                if (!int.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out result))
-                    return @default;
-
-                return result;
-            }
-
-            public static string GetString(string key, string @default = null)
-            {
-                return ConfigurationManager.AppSettings[key] ?? @default;
-            }
         }
     }
 }

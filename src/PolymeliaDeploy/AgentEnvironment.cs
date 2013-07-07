@@ -15,14 +15,12 @@
         {
             get
             {
-                if (_current != null)
+                if (_current == null)
                 {
                     lock (SyncRoot)
                     {
-                        if (_current != null)
-                        {
+                        if (_current == null)
                             _current = new AgentEnvironment();
-                        }
                     }
                 }
 

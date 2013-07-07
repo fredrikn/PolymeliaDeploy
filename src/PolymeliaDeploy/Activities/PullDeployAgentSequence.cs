@@ -75,17 +75,6 @@ namespace PolymeliaDeploy.Activities
             foreach (var variable in Variables)
                 sequence.Variables.Add(variable);
 
-            //foreach (var deployVariable in DeployVariables)
-            //{
-            //    sequence.Variables.Add(
-            //        new Variable<string>
-            //            {
-            //                Name = deployVariable.Key,
-            //                Default =
-            //                    deployVariable.Value == null ? string.Empty : deployVariable.Value.ToString()
-            //            });
-            //}
-
             return sequence;
         }
     }

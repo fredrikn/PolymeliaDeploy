@@ -13,17 +13,15 @@
     {
         public void Run(MainActivity mainActivity)
         {
-            //var parameters = new Dictionary<string, object>
-            //                     {
-            //                         { "DeployTaskId", mainActivity.Id },
-            //                         { "DeployTaskVersion", mainActivity.Version }
-            //                     };
+            var parameters = new Dictionary<string, object>
+                                 {
+                                     { "DeployTaskId", mainActivity.Id },
+                                     { "DeployTaskVersion", mainActivity.Version }
+                                 };
 
-            AgentEnvironment.Current.TaskId = mainActivity.Id;
-            AgentEnvironment.Current.DeployVersion = mainActivity.Version;
 
             var wf = ActivityXamlServices.Load(new StringReader(mainActivity.DeployActivity));
-            var wfApp = new WorkflowApplication(wf);
+            var wfApp = new WorkflowApplication(wf, parameters);
 
             wfApp.Completed = delegate(WorkflowApplicationCompletedEventArgs e)
             {
