@@ -1,18 +1,29 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using Microsoft.AspNet.SignalR;
+
 using PolymeliaDeploy.ApiDto;
 using PolymeliaDeploy.Data;
 
 namespace PolymeliaDeployController.Hub
 {
+    using PolymeliaDeploy.Data.Repositories;
+
     public class DeployControllerHub : Microsoft.AspNet.SignalR.Hub
     {
         private IDictionary<string, string> _connectedAgents = new Dictionary<string, string>();
+
+        private IReportRepository _reportRepository;
+
+        public DeployControllerHub(IReportRepository reportRepository)
+        {
+            if (reportRepository == null) throw new ArgumentNullException("reportRepository");
+
+            _reportRepository = reportRepository;
+        }
         
+
         public void SendMessage(string message)
         {
             Console.WriteLine(string.Format("{0}: {1}", GetAgentIpAddress(), message));
@@ -23,14 +34,7 @@ namespace PolymeliaDeployController.Hub
 
         public async Task Report(ActivityReport report)
         {
-            await Task.Run( () =>
-            {
-                using (var db = new PolymeliaDeployDbContext())
-                {
-                    db.ActivityReports.Add(report);
-                    db.SaveChanges();
-                }
-            });
+            await _reportRepository.AddReport(report);
         }
 
 

@@ -90,6 +90,8 @@
     <Compile Include="Activities\InstallNuGetPackage.cs" />
     <Compile Include="Activities\PolymeliaNativiveActivity.cs" />
     <Compile Include="Activities\PullDeployAgentSequence.cs" />
+    <Compile Include="Data\Repositories\IReportRepository.cs" />
+    <Compile Include="Data\Repositories\ReportRepository.cs" />
     <Compile Include="DeployController\IDeployControllerClient.cs" />
     <Compile Include="Workflow\PolymeliaTrackingParticipant.cs" />
     <Compile Include="Workflow\IgnorableXamlXmlWriter.cs" />

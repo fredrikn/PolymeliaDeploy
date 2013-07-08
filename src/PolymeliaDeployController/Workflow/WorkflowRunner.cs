@@ -7,7 +7,6 @@
     using System.IO;
 
     using PolymeliaDeploy.Data;
-    using PolymeliaDeploy;
 
     internal class WorkflowRunner
     {
