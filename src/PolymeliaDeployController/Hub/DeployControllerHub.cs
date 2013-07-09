@@ -12,15 +12,20 @@ namespace PolymeliaDeployController.Hub
 
     public class DeployControllerHub : Microsoft.AspNet.SignalR.Hub
     {
-        private IDictionary<string, string> _connectedAgents = new Dictionary<string, string>();
+        private readonly IDictionary<string, string> _connectedAgents = new Dictionary<string, string>();
 
-        private IReportRepository _reportRepository;
+        private readonly IReportRepository _reportRepository;
+        private readonly IActivityRepository _activityRepository;
 
-        public DeployControllerHub(IReportRepository reportRepository)
+        public DeployControllerHub(
+                                   IReportRepository reportRepository,
+                                   IActivityRepository activityRepository)
         {
             if (reportRepository == null) throw new ArgumentNullException("reportRepository");
+            if (activityRepository == null) throw new ArgumentNullException("activityRepository");
 
             _reportRepository = reportRepository;
+            _activityRepository = activityRepository;
         }
         
 
@@ -40,65 +45,35 @@ namespace PolymeliaDeployController.Hub
 
         public async Task UpdateActivityTaskStatus(long activityTaskId, ActivityStatus status)
         {
-            await Task.Run(() =>
-            {
-                using (var db = new PolymeliaDeployDbContext())
-                {
-                    var activityTask = db.ActivityTasks.SingleOrDefault(t => t.Id == activityTaskId);
-
-                    activityTask.Status = status;
-
-                    if (status == ActivityStatus.Failed)
-                    {
-                        var mainActivity = db.MainActivities.SingleOrDefault(t => t.Id == activityTask.TaskId);
-                        mainActivity.Status = ActivityStatus.Failed;
-                    }
-
-                    db.SaveChanges();
-                }
-            });
+            await _activityRepository.UpdateActivityTaskStatus(activityTaskId, status);
         }
 
 
-        public IEnumerable<ActivityTaskDto> GetActivityTasks(int lastTaskId, string serverRole)
+        public async Task<IEnumerable<ActivityTaskDto>> GetActivityTasks(int lastTaskId, string serverRole)
         {
-            using (var db = new PolymeliaDeployDbContext())
+            var activites = await _activityRepository.GetActivityTasks(lastTaskId, serverRole);
+
+            //var variablesForEnvironment = GetEnvironmentVariables(db, maintask);
+
+            var actititiesToRun = activites.ToList().Select(a => new ActivityTaskDto
             {
-                var maintask = db.MainActivities.Where(t => t.Id > lastTaskId &&
-                                                      (t.Status != ActivityStatus.Failed ||
-                                                       t.Status != ActivityStatus.Canceled))
-                                                .OrderByDescending(t => t.Id)
-                                                .FirstOrDefault();
+                TaskId = a.TaskId,
+                Id = a.Id,
+                ActivityCode = a.ActivityCode,
+                ActivityName = a.ActivityName,
+                DeployVersion = a.DeployVersion,
+                Created = a.Created,
+                CreatedBy = a.CreatedBy,
+                ServerRole = a.ServerRole,
+                Status = a.Status,
+                //Variables = variablesForEnvironment
+            });
 
-                if (maintask != null)
-                {
-                    var activites = db.ActivityTasks.Where(t => t.ServerRole == serverRole &&
-                                                                t.TaskId == maintask.Id)
-                                                    .OrderBy(t => t.Id);
+            if (!actititiesToRun.Any(a => a.Status == ActivityStatus.Failed ||
+                a.Status == ActivityStatus.Canceled))
+                return actititiesToRun;
 
-                    //var variablesForEnvironment = GetEnvironmentVariables(db, maintask);
-
-                    var actititiesToRun = activites.ToList().Select(a => new ActivityTaskDto
-                    {
-                        TaskId = a.TaskId,
-                        Id = a.Id,
-                        ActivityCode = a.ActivityCode,
-                        ActivityName = a.ActivityName,
-                        DeployVersion = maintask.Version,
-                        Created = a.Created,
-                        CreatedBy = a.CreatedBy,
-                        ServerRole = a.ServerRole,
-                        Status = a.Status,
-                        //Variables = variablesForEnvironment
-                    });
-
-                    if (!actititiesToRun.Any(a => a.Status == ActivityStatus.Failed ||
-                        a.Status == ActivityStatus.Canceled))
-                        return actititiesToRun;
-                }
-
-                return new List<ActivityTaskDto>();
-            }
+            return new List<ActivityTaskDto>();
         }
 
 

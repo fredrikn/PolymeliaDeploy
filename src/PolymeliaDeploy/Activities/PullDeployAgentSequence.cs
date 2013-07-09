@@ -54,6 +54,7 @@ namespace PolymeliaDeploy.Activities
                                 ActivityCode = activity,
                                 CreatedBy = Thread.CurrentPrincipal.Identity.Name,
                                 ActivityName = DisplayName,
+                                DeployVersion = AgentEnvironment.Current.DeployVersion,
                                 Status = ActivityStatus.New
                            };
 

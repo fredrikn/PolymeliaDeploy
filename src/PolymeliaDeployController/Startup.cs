@@ -11,12 +11,14 @@
     {
         public void Configuration(IAppBuilder app)
         {
-            // Turn cross domain on 
             var config = new HubConfiguration { EnableCrossDomain = true };
 
+            //TODO: Add a IoC Container
             GlobalHost.DependencyResolver.Register(
                                                    typeof(DeployControllerHub),
-                                                   () => new DeployControllerHub(new ReportRepository()));
+                                                   () => new DeployControllerHub(
+                                                                               new ReportRepository(),
+                                                                               new ActivityRepository()));
 
             app.MapHubs(config);
 

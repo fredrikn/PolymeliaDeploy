@@ -19,6 +19,8 @@
 
         public string ServerRole { get; set; }
 
+        public string DeployVersion { get; set; }
+
         public string ActivityCode { get; set; }
 
         public string CreatedBy { get; set; }
