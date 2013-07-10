@@ -7,9 +7,6 @@ using System.Activities.Tracking;
 using System.Activities.XamlIntegration;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PolymeliaDeploy.Agent.Activity
 {
@@ -21,8 +18,6 @@ namespace PolymeliaDeploy.Agent.Activity
                                  Action<ActivityTaskDto> activitySucceededAction = null,
                                  Action<ActivityTaskDto, Exception> activityFailedAction = null)
         {
-
-            //TODO: Remove lastestTaskRunId
             long? lastExecutedTaskId = null;
 
             foreach (var task in tasks)
@@ -37,7 +32,7 @@ namespace PolymeliaDeploy.Agent.Activity
         }
 
 
-        private bool ExecuteTask(
+        private static bool ExecuteTask(
                                  ActivityTaskDto activityTask,
                                  Action<ActivityReport> reportAction = null,
                                  Action<ActivityTaskDto> activitySucceededAction = null,
@@ -49,7 +44,6 @@ namespace PolymeliaDeploy.Agent.Activity
                 agentEnvironment.CurrentActivityId = activityTask.Id;
                 agentEnvironment.TaskId = activityTask.TaskId;
                 agentEnvironment.DeployVersion = activityTask.DeployVersion;
-                agentEnvironment.Variables = activityTask.Variables;
                 agentEnvironment.ServerRole = activityTask.ServerRole;
 
                 InvokeWorkflowActivity(activityTask, reportAction);
@@ -76,15 +70,15 @@ namespace PolymeliaDeploy.Agent.Activity
         private static void InvokeWorkflowActivity(ActivityTaskDto activityTask, Action<ActivityReport> reportAction = null)
         {
 
-            var parameters = new Dictionary<string, object>
-                                 {
-                                     { "DeployTaskId", activityTask.TaskId },
-                                     { "DeployTaskVersion", activityTask.DeployVersion }
-                                 };
+            //var parameters = new Dictionary<string, object>
+            //                     {
+            //                         { "DeployTaskId", activityTask.TaskId },
+            //                         { "DeployTaskVersion", activityTask.DeployVersion }
+            //                     };
 
             //TODO: The DeployController uses a WorkflowRunner, make it reusable and use it even here.
             var invoker = CreateWorkflowInvoker(activityTask, reportAction);
-            invoker.Invoke(parameters);
+            invoker.Invoke();
 
             activityTask.Status = ActivityStatus.Completed;
         }
@@ -92,7 +86,7 @@ namespace PolymeliaDeploy.Agent.Activity
 
         private static WorkflowInvoker CreateWorkflowInvoker(ActivityTaskDto activityTask, Action<ActivityReport> reportAction)
         {
-            WorkflowInvoker invoker = new WorkflowInvoker(LoadActivity(activityTask));
+            var invoker = new WorkflowInvoker(LoadActivity(activityTask));
             invoker.Extensions.Add(CreateTrackingParticipant(reportAction));
             return invoker;
         }
@@ -100,16 +94,16 @@ namespace PolymeliaDeploy.Agent.Activity
 
         private static PolymeliaTrackingParticipant CreateTrackingParticipant(Action<ActivityReport> reportAction)
         {
-            const String all = "*";
+            const String ALL = "*";
 
             return new PolymeliaTrackingParticipant(reportAction)
             {
-                TrackingProfile = new TrackingProfile()
+                TrackingProfile = new TrackingProfile
                 {
                     Name = "CustomTrackingProfile",
                     Queries = 
                     {
-                        new CustomTrackingQuery() { Name = all, ActivityName = all }
+                        new CustomTrackingQuery { Name = ALL, ActivityName = ALL }
                     }
                 }
             };

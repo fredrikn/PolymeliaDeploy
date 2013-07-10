@@ -1,11 +1,9 @@
 ﻿namespace PolymeliaDeploy.Activities
 {
-    using System.Collections.Generic;
     using System.Activities;
     using System.Collections.ObjectModel;
     using System.ComponentModel;
 
-    using PolymeliaDeploy.Controller;
     using PolymeliaDeploy.Data;
 
     using Variable = System.Activities.Variable;
@@ -15,22 +13,12 @@
 
     public abstract class PolymeliaNativiveActivity : NativeActivity
     {
-        private Collection<Variable> _variables = new Collection<Variable>();
-
-
-        private IReportClient reportRemoteClient;
-
+        private readonly Collection<Variable> _variables = new Collection<Variable>();
 
         [Browsable(false)]
         public Collection<Variable> Variables
         {
-            get { return this._variables; }
-        }
-
-
-        public PolymeliaNativiveActivity()
-        {
-            reportRemoteClient = DeployServices.ReportClient;
+            get { return _variables; }
         }
 
 

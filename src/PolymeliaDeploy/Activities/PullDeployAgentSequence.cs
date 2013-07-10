@@ -8,8 +8,9 @@ using System.Xaml;
 
 namespace PolymeliaDeploy.Activities
 {
+    using System.Activities.Statements;
+    using System.Collections.Generic;
     using System.Threading;
-
     using PolymeliaDeploy.Data;
     using PolymeliaDeploy.Workflow;
 
@@ -17,7 +18,7 @@ namespace PolymeliaDeploy.Activities
     [DisplayName("Deploy to Agent")]
     public class PullDeployAgentSequence : PolymeliaNativiveActivity
     {
-        private Collection<Activity> _activities = new Collection<Activity>();
+        private readonly Collection<Activity> _activities = new Collection<Activity>();
 
 
         [RequiredArgument]
@@ -50,7 +51,7 @@ namespace PolymeliaDeploy.Activities
             var task = new ActivityTask
                            {
                                 TaskId = AgentEnvironment.Current.TaskId,
-                                ServerRole = context.GetValue(this.ServerRole),
+                                ServerRole = context.GetValue(ServerRole),
                                 ActivityCode = activity,
                                 CreatedBy = Thread.CurrentPrincipal.Identity.Name,
                                 ActivityName = DisplayName,
@@ -68,7 +69,12 @@ namespace PolymeliaDeploy.Activities
 
         private Start CreateSequence()
         {
-            var sequence = new Start(); // { DeployVersion = DeployVersion, TaskId = TaskId };
+            var sequence = new Start
+                            {
+                                DeployTaskId = AgentEnvironment.Current.TaskId,
+                                DeployTaskVersion = AgentEnvironment.Current.DeployVersion,
+                                DeployVariables = new InArgument<ICollection<Variable>>(AgentEnvironment.Current.Variables),
+                            };
 
             foreach (var activity in Activities)
                 sequence.Activities.Add(activity);

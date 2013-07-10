@@ -4,10 +4,7 @@ using PolymeliaDeploy.ApiDto;
 using PolymeliaDeploy.Data;
 using PolymeliaDeploy.DeployController;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PolymeliaDeploy.Agent
 {
@@ -15,10 +12,10 @@ namespace PolymeliaDeploy.Agent
     {
         private bool _isDisposed;
 
-        private IDeployControllerClient _deployControllerClient;
-        private IAgentConfigurationSettings _agentConfig;
-        private ITaskActivityExecutioner _taskActivityExecutioner;
-        private IRecordLatestTask _recordLatestTask;
+        private readonly IDeployControllerClient _deployControllerClient;
+        private readonly IAgentConfigurationSettings _agentConfig;
+        private readonly ITaskActivityExecutioner _taskActivityExecutioner;
+        private readonly IRecordLatestTask _recordLatestTask;
 
         public AgentService(
                             IDeployControllerClient deployControllerClient,
@@ -53,7 +50,7 @@ namespace PolymeliaDeploy.Agent
         {
             var lastTaskId = _recordLatestTask.GetValue();
 
-            var tasks = _deployControllerClient.GetActivityTasks(lastTaskId).Result;
+            var tasks = _deployControllerClient.GetActivityTasks(lastTaskId).Result.ToArray();
 
             if (tasks.Any())
             {

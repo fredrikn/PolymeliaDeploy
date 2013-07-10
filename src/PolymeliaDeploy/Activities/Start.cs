@@ -1,9 +1,13 @@
 ﻿namespace PolymeliaDeploy.Activities
 {
     using System.Activities;
+    using System.Activities.Expressions;
+    using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.ComponentModel;
     using System.Windows.Markup;
+
+    using Variable = PolymeliaDeploy.Data.Variable;
 
     [Designer("System.Activities.Core.Presentation.SequenceDesigner, System.Activities.Core.Presentation")]
     [ContentProperty("Activities")]
@@ -11,9 +15,11 @@
     {
         private Collection<Activity> _activities = new Collection<Activity>();
 
-        private Variable<int> lastIndexHint;
+        private Variable<int> _lastIndexHint;
 
-        private CompletionCallback onChildComplete;
+        private CompletionCallback _onChildComplete;
+
+        private InArgument<ICollection<Variable>> _deployVariables = new InArgument<ICollection<Variable>>();
 
         [Browsable(false)]
         public InArgument<long> DeployTaskId { get; set; }
@@ -22,18 +28,26 @@
         public InArgument<string> DeployTaskVersion { get; set; }
 
 
+        [Browsable(false)]
+        public InArgument<ICollection<Variable>> DeployVariables
+        {
+            get { return _deployVariables; }
+            set { _deployVariables = value; }
+        }
+
+
         [DependsOn("Variables")]
         [Browsable(false)]
         public Collection<Activity> Activities
         {
-            get { return this._activities; }
+            get { return _activities; }
         }
 
 
         public Start()
         {
-            this.lastIndexHint = new Variable<int>();
-            this.onChildComplete = this.InternalExecute;
+            _lastIndexHint = new Variable<int>();
+            _onChildComplete = InternalExecute;
         }
 
 
@@ -42,7 +56,7 @@
             metadata.SetChildrenCollection(Activities);
             metadata.SetVariablesCollection(Variables);
             metadata.SetArgumentsCollection(metadata.GetArgumentsWithReflection());
-            metadata.AddImplementationVariable(lastIndexHint);
+            metadata.AddImplementationVariable(_lastIndexHint);
         }
 
 
@@ -50,29 +64,30 @@
         {
             AgentEnvironment.Current.TaskId = DeployTaskId.Get(context);
             AgentEnvironment.Current.DeployVersion = DeployTaskVersion.Get(context);
+            AgentEnvironment.Current.Variables = DeployVariables.Get(context);
 
-            if (this._activities == null || this.Activities.Count <= 0)
+            if (_activities == null || Activities.Count <= 0)
                 return;
 
-            var activity = this.Activities[0];
-            context.ScheduleActivity(activity, this.onChildComplete);
+            var activity = Activities[0];
+            context.ScheduleActivity(activity, _onChildComplete);
         }
 
 
         private void InternalExecute(NativeActivityContext context, ActivityInstance completedInstance)
         {
-            var index1 = this.lastIndexHint.Get(context);
+            var index1 = _lastIndexHint.Get(context);
 
-            if (index1 >= this.Activities.Count || this.Activities[index1] != completedInstance.Activity)
-                index1 = this.Activities.IndexOf(completedInstance.Activity);
+            if (index1 >= Activities.Count || Activities[index1] != completedInstance.Activity)
+                index1 = Activities.IndexOf(completedInstance.Activity);
 
             var index2 = index1 + 1;
-            if (index2 == this.Activities.Count)
+            if (index2 == Activities.Count)
                 return;
 
-            var activity = this.Activities[index2];
-            context.ScheduleActivity(activity, this.onChildComplete);
-            this.lastIndexHint.Set(context, index2);
+            var activity = Activities[index2];
+            context.ScheduleActivity(activity, _onChildComplete);
+            _lastIndexHint.Set(context, index2);
         }
     }
 }

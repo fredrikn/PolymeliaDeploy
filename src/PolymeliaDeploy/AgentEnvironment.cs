@@ -1,8 +1,7 @@
 ﻿namespace PolymeliaDeploy
 {
-    using System.Collections.Generic;
     using System;
-
+    using System.Collections.Generic;
 
     public class AgentEnvironment
     {
@@ -28,7 +27,7 @@
             }
         }
 
-        public IDictionary<string, string> Variables { get; set; }
+        public ICollection<PolymeliaDeploy.Data.Variable> Variables { get; set; }
         public string ServerRole { get; set; }
         public long? CurrentActivityId { get; set; }
         public long TaskId { get; set; }

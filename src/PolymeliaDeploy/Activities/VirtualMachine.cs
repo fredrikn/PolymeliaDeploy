@@ -2,10 +2,7 @@
 {
     using System.Activities;
     using System.ComponentModel;
-
     using PolymeliaDeploy.Management;
-    using System.Activities.Tracking;
-    using System.Diagnostics;
 
     public enum VirtualMachineState
     {
@@ -25,8 +22,7 @@
         [Description("The name of the VirtualMachin")]
         public InArgument<VirtualMachineState> SetState { get; set; }
 
-
-        HyperVManager _hyperVManger;
+        readonly HyperVManager _hyperVManger;
 
         public VirtualMachine()
         {

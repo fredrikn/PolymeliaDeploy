@@ -4,7 +4,9 @@
     using System.Collections.Generic;
     using System.Activities;
     using System.Activities.XamlIntegration;
+    using System.Collections.ObjectModel;
     using System.IO;
+    using System.Linq;
 
     using PolymeliaDeploy.Data;
 
@@ -12,10 +14,23 @@
     {
         public void Run(MainActivity mainActivity)
         {
+
+            var deployVariables = new Collection<PolymeliaDeploy.Data.Variable>();
+
+            using (var db = new PolymeliaDeployDbContext())
+            {
+                var variables = db.Variables.Where(e => e.EnvironmentId == mainActivity.EnvironmentId);
+
+                foreach (var variable in variables)
+                    deployVariables.Add(variable);
+            }
+
+
             var parameters = new Dictionary<string, object>
                                  {
                                      { "DeployTaskId", mainActivity.Id },
-                                     { "DeployTaskVersion", mainActivity.Version }
+                                     { "DeployTaskVersion", mainActivity.Version },
+                                     { "DeployVariables", deployVariables }
                                  };
 
 
