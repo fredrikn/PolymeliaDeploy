@@ -1,21 +1,22 @@
 ﻿using PolymeliaDeploy.Data;
-using PolymeliaDeploy.DeployController;
+
 using System;
 using System.Activities.Tracking;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PolymeliaDeploy.Workflow
 {
+    using PolymeliaDeploy.DeployController;
+
     public class PolymeliaTrackingParticipant : TrackingParticipant
     {
-        private Action<ActivityReport> _reportAction;
+        private IDeployConrollerReportClient _reportClient;
 
-        public PolymeliaTrackingParticipant(Action<ActivityReport> reportAction)
+        public PolymeliaTrackingParticipant(IDeployConrollerReportClient reportClient)
         {
-            _reportAction = reportAction;
+            if (reportClient == null) throw new ArgumentNullException("reportClient");
+
+            _reportClient = reportClient;
+
         }
 
 
@@ -29,10 +30,10 @@ namespace PolymeliaDeploy.Workflow
                 {
                     var activityReport = customTrackingRecord.Data["Record"] as ActivityReport;
 
-                    if (activityReport != null && _reportAction != null)
+                    if (activityReport != null)
                     {
                         Console.WriteLine(activityReport.Message);
-                        _reportAction(activityReport);
+                        _reportClient.Report(activityReport);
                     }
                 }
             }

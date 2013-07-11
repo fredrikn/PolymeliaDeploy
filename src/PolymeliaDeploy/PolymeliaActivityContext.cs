@@ -1,16 +1,18 @@
 ﻿namespace PolymeliaDeploy
 {
     using System;
-    using System.Collections.Generic;
+    using System.Collections.ObjectModel;
 
-    public class AgentEnvironment
+    using PolymeliaDeploy.Data;
+
+    public class PolymeliaActivityContext
     {
         private readonly static object SyncRoot = new object();
 
         [ThreadStatic]
-        private static volatile AgentEnvironment _current;
+        private static volatile PolymeliaActivityContext _current;
 
-        public static AgentEnvironment Current
+        public static PolymeliaActivityContext Current
         {
             get
             {
@@ -19,7 +21,7 @@
                     lock (SyncRoot)
                     {
                         if (_current == null)
-                            _current = new AgentEnvironment();
+                            _current = new PolymeliaActivityContext();
                     }
                 }
 
@@ -27,10 +29,12 @@
             }
         }
 
-        public ICollection<PolymeliaDeploy.Data.Variable> Variables { get; set; }
+        public Collection<DeployVariable> Variables { get; set; }
         public string ServerRole { get; set; }
         public long? CurrentActivityId { get; set; }
         public long TaskId { get; set; }
         public string DeployVersion { get; set; }
+
+        public string Environment { get; set; }
     }
 }

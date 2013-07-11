@@ -52,7 +52,7 @@ namespace PolymeliaDeploy.Controller
                 ServerRole = serverRole,
                 ActivityName = activityName,
                 Status = reportStatus,
-                ActivityTaskId = AgentEnvironment.Current.CurrentActivityId
+                ActivityTaskId = PolymeliaActivityContext.Current.CurrentActivityId
             };
 
             var client = GetDeployWebHttpClient();

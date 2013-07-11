@@ -7,9 +7,7 @@
 
     using PolymeliaDeploy.Data;
 
-    [Designer("System.Activities.Core.Presentation.SequenceDesigner, System.Activities.Core.Presentation")]
-    [ContentProperty("Activities")]
-    public sealed class Start : PolymeliaNativiveActivity
+    public sealed class StartAgentActivity : PolymeliaNativiveActivity
     {
         private Collection<Activity> _activities = new Collection<Activity>();
 
@@ -17,7 +15,7 @@
 
         private CompletionCallback _onChildComplete;
 
-        private InArgument<Collection<DeployVariable>> _deployVariables = new InArgument<Collection<DeployVariable>>();
+        private Collection<DeployVariable> _deployVariables = new Collection<DeployVariable>();
 
         [Browsable(false)]
         public InArgument<long> DeployTaskId { get; set; }
@@ -25,12 +23,15 @@
         [Browsable(false)]
         public InArgument<string> DeployTaskVersion { get; set; }
 
+        [Browsable(false)]
+        public InArgument<string> ServerRole { get; set; }
 
         [Browsable(false)]
-        public InArgument<string> DeployEnvironment { get; set; }
+        public InArgument<string> Environment { get; set; }
+
 
         [Browsable(false)]
-        public InArgument<Collection<DeployVariable>> DeployVariables
+        public Collection<DeployVariable> DeployVariables
         {
             get { return _deployVariables; }
             set { _deployVariables = value; }
@@ -45,7 +46,7 @@
         }
 
 
-        public Start()
+        public StartAgentActivity()
         {
             _lastIndexHint = new Variable<int>();
             _onChildComplete = InternalExecute;
@@ -65,8 +66,9 @@
         {
             PolymeliaActivityContext.Current.TaskId = DeployTaskId.Get(context);
             PolymeliaActivityContext.Current.DeployVersion = DeployTaskVersion.Get(context);
-            PolymeliaActivityContext.Current.Variables = DeployVariables.Get(context);
-            PolymeliaActivityContext.Current.Environment = DeployEnvironment.Get(context);
+            PolymeliaActivityContext.Current.Variables = DeployVariables;
+            PolymeliaActivityContext.Current.ServerRole = ServerRole.Get(context);
+            PolymeliaActivityContext.Current.Environment = Environment.Get(context);
 
             if (_activities == null || Activities.Count <= 0)
                 return;

@@ -8,8 +8,6 @@ using System.Xaml;
 
 namespace PolymeliaDeploy.Activities
 {
-    using System.Activities.Statements;
-    using System.Collections.Generic;
     using System.Threading;
     using PolymeliaDeploy.Data;
     using PolymeliaDeploy.Workflow;
@@ -39,7 +37,7 @@ namespace PolymeliaDeploy.Activities
             var sw = new StringWriter(s);
 
             var xw2 = ActivityXamlServices.CreateBuilderWriter(new IgnorableXamlXmlWriter(sw, new XamlSchemaContext()));
-            XamlServices.Save(xw2, CreateSequence());
+            XamlServices.Save(xw2, CreateSequence(context));
             sw.Close();
 
             PullDeploy(context, s.ToString());
@@ -50,12 +48,13 @@ namespace PolymeliaDeploy.Activities
         {
             var task = new ActivityTask
                            {
-                                TaskId = AgentEnvironment.Current.TaskId,
-                                ServerRole = context.GetValue(ServerRole),
+                                TaskId = PolymeliaActivityContext.Current.TaskId,
+                                Environment = PolymeliaActivityContext.Current.Environment,
+                                ServerRole = ServerRole.Get(context),
                                 ActivityCode = activity,
                                 CreatedBy = Thread.CurrentPrincipal.Identity.Name,
                                 ActivityName = DisplayName,
-                                DeployVersion = AgentEnvironment.Current.DeployVersion,
+                                DeployVersion = PolymeliaActivityContext.Current.DeployVersion,
                                 Status = ActivityStatus.New
                            };
 
@@ -67,13 +66,15 @@ namespace PolymeliaDeploy.Activities
         }
 
 
-        private Start CreateSequence()
+        private StartAgentActivity CreateSequence(NativeActivityContext context)
         {
-            var sequence = new Start
+            var sequence = new StartAgentActivity
                             {
-                                DeployTaskId = AgentEnvironment.Current.TaskId,
-                                DeployTaskVersion = AgentEnvironment.Current.DeployVersion,
-                                DeployVariables = new InArgument<ICollection<Variable>>(AgentEnvironment.Current.Variables),
+                                DeployTaskId = PolymeliaActivityContext.Current.TaskId,
+                                DeployTaskVersion = PolymeliaActivityContext.Current.DeployVersion,
+                                DeployVariables = PolymeliaActivityContext.Current.Variables,
+                                ServerRole = ServerRole.Get(context),
+                                Environment = PolymeliaActivityContext.Current.Environment
                             };
 
             foreach (var activity in Activities)

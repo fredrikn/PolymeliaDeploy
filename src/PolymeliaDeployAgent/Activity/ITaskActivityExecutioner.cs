@@ -1,5 +1,5 @@
 ﻿using PolymeliaDeploy.ApiDto;
-using PolymeliaDeploy.Data;
+
 using System;
 using System.Collections.Generic;
 namespace PolymeliaDeploy.Agent.Activity
@@ -8,8 +8,7 @@ namespace PolymeliaDeploy.Agent.Activity
     {
         long? ExecuteTasks(
                           IEnumerable<ActivityTaskDto> tasks,
-                          Action<ActivityReport> reportAction = null,
                           Action<ActivityTaskDto> activitySucceededAction = null,
-                          Action<ActivityTaskDto, Exception> activityFailedAction = null);
+                          Action<ActivityTaskDto, string> activityFailedAction = null);
     }
 }

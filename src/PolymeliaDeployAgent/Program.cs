@@ -1,15 +1,15 @@
 ﻿using System;
-using System.Configuration;
-using System.Globalization;
 using System.ServiceProcess;
-using PolymeliaDeploy.Controller;
-using Microsoft.AspNet.SignalR.Client.Hubs;
+
 using PolymeliaDeploy.Agent.Configuration;
-using System.Threading.Tasks;
 using PolymeliaDeploy.Agent.Activity;
 
 namespace PolymeliaDeploy.Agent
 {
+    using PolymeliaDeploy.Workflow;
+
+    using Environment = System.Environment;
+
     internal static class Program
     {
         private static void Main()
@@ -29,7 +29,8 @@ namespace PolymeliaDeploy.Agent
             var agentConfig = new AgentConfigurationSettings();
             var deployControllerClient = new DeployControllerClient();
             var recordLastTaskId = new FileRecordLatestTask("lasttaskid.dat");
-            var taskExecutioner = new TaskActivityExecutioner();
+            var workflowRunner = new WorkflowRunner(new PolymeliaTrackingParticipantFactory().CreateTrackingParticipant(deployControllerClient));
+            var taskExecutioner = new TaskActivityExecutioner(workflowRunner);
 
             return new AgentService(
                                     deployControllerClient,

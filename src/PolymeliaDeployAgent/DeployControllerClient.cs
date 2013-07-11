@@ -1,23 +1,16 @@
 ﻿using System;
-using System.Activities;
-using System.Activities.XamlIntegration;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using PolymeliaDeploy.ApiDto;
-using PolymeliaDeploy.Controller;
 using PolymeliaDeploy.Data;
 using Microsoft.AspNet.SignalR.Client.Hubs;
-using PolymeliaDeploy.Agent.Activity;
 using Microsoft.AspNet.SignalR.Client;
-using System.Configuration;
+
 using PolymeliaDeploy.DeployController;
 
 namespace PolymeliaDeploy.Agent
 {
-    public class DeployControllerClient : IDeployControllerClient
+    public class DeployControllerClient : IDeployControllerClient, IDeployConrollerReportClient
     {
         private bool _isRunning;
         private bool _isDesposed;

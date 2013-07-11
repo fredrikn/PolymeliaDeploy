@@ -2,6 +2,7 @@
 {
     using System.Activities;
     using System.ComponentModel;
+
     using PolymeliaDeploy.Management;
 
     public enum VirtualMachineState

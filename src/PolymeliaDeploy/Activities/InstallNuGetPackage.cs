@@ -132,7 +132,7 @@
 
         private Dictionary<string, object> CreatePowerShellScriptVariables(NativeActivityContext context)
         {
-            //TODO: Add varaibles, using the AgentEnvironment
+            //TODO: Add varaibles, using the PolymeliaActivityContext
 
             //var variables = new Dictionary<string, object>(DeployVariables)
             //                    {
@@ -363,7 +363,7 @@
         {
             var msg = string.Format(message, arguments);
 
-            await reportRemoteClient.Report(AgentEnvironment.Current.TaskId, AgentEnvironment.Current.ServerRole, msg, DisplayName);
+            await reportRemoteClient.Report(PolymeliaActivityContext.Current.TaskId, PolymeliaActivityContext.Current.ServerRole, msg, DisplayName);
 
             Console.WriteLine(msg);
         }
@@ -373,7 +373,7 @@
         {
             var msg = string.Format(message, arguments);
 
-            await reportRemoteClient.Report(AgentEnvironment.Current.TaskId, AgentEnvironment.Current.ServerRole, msg, DisplayName, ReportStatus.Error);
+            await reportRemoteClient.Report(PolymeliaActivityContext.Current.TaskId, PolymeliaActivityContext.Current.ServerRole, msg, DisplayName, ReportStatus.Error);
 
             Console.WriteLine(msg);
         }

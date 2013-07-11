@@ -53,11 +53,12 @@
 
         private void Report(string msg, TraceLevel traceLevel, NativeActivityContext context)
         {
-            var activityReport = new ActivityReport()
+            var activityReport = new ActivityReport
             {
-                TaskId = AgentEnvironment.Current.TaskId,
+                TaskId = PolymeliaActivityContext.Current.TaskId,
                 MachineName = System.Environment.MachineName,
-                ServerRole = AgentEnvironment.Current.ServerRole,
+                ServerRole = PolymeliaActivityContext.Current.ServerRole,
+                Environment = PolymeliaActivityContext.Current.Environment,
                 ActivityName = DisplayName,
                 Message = msg,
                 Status = ConvertTraceLevelToReportStatus(traceLevel)
@@ -123,8 +124,8 @@
                 return;
 
             //reportRemoteClient.Report(
-            //                          AgentEnvironment.Current.TaskId,
-            //                          AgentEnvironment.Current.ServerRole,
+            //                          PolymeliaActivityContext.Current.TaskId,
+            //                          PolymeliaActivityContext.Current.ServerRole,
             //                          msg,
             //                          DisplayName,
             //                          status);

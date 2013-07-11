@@ -88,8 +88,9 @@ namespace PolymeliaDeployClient.Forms
                 CreatedBy = Thread.CurrentPrincipal.Identity.Name,
                 DeployActivity = SelectedEnvironment.WorkflowContent,
                 EnvironmentId = SelectedEnvironment.Id,
+                Environment = SelectedEnvironment.Name,
                 Version = versionTextBox.Text,
-                ProjectId = SelectedEnvironment.ProjectId
+                ProjectId = SelectedEnvironment.ProjectId,
             });
 
             StartGettingReports(taskId);

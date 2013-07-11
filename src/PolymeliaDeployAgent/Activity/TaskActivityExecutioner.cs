@@ -2,21 +2,26 @@
 using PolymeliaDeploy.Data;
 using PolymeliaDeploy.Workflow;
 using System;
-using System.Activities;
-using System.Activities.Tracking;
-using System.Activities.XamlIntegration;
 using System.Collections.Generic;
-using System.IO;
 
 namespace PolymeliaDeploy.Agent.Activity
 {
     public class TaskActivityExecutioner : ITaskActivityExecutioner
     {
+        private readonly IWorkflowRunner _workflowRunner;
+        
+        public TaskActivityExecutioner(IWorkflowRunner workflowRunner)
+        {
+            if (workflowRunner == null) throw new ArgumentNullException("workflowRunner");
+
+            _workflowRunner = workflowRunner;
+        }
+
+
         public long? ExecuteTasks(
                                  IEnumerable<ActivityTaskDto> tasks,
-                                 Action<ActivityReport> reportAction = null,
                                  Action<ActivityTaskDto> activitySucceededAction = null,
-                                 Action<ActivityTaskDto, Exception> activityFailedAction = null)
+                                 Action<ActivityTaskDto, string> activityFailedAction = null)
         {
             long? lastExecutedTaskId = null;
 
@@ -24,7 +29,7 @@ namespace PolymeliaDeploy.Agent.Activity
             {
                 lastExecutedTaskId = task.TaskId;
 
-                if (!ExecuteTask(task, reportAction, activitySucceededAction, activityFailedAction))
+                if (!ExecuteTask(task, activitySucceededAction, activityFailedAction))
                     break;
             }
 
@@ -32,88 +37,59 @@ namespace PolymeliaDeploy.Agent.Activity
         }
 
 
-        private static bool ExecuteTask(
+        private bool ExecuteTask(
                                  ActivityTaskDto activityTask,
-                                 Action<ActivityReport> reportAction = null,
                                  Action<ActivityTaskDto> activitySucceededAction = null,
-                                 Action<ActivityTaskDto, Exception> activityFailedAction = null)
+                                 Action<ActivityTaskDto, string> activityFailedAction = null)
         {
             try
             {
-                var agentEnvironment = AgentEnvironment.Current;
+                var agentEnvironment = PolymeliaActivityContext.Current;
                 agentEnvironment.CurrentActivityId = activityTask.Id;
-                agentEnvironment.TaskId = activityTask.TaskId;
-                agentEnvironment.DeployVersion = activityTask.DeployVersion;
                 agentEnvironment.ServerRole = activityTask.ServerRole;
 
-                InvokeWorkflowActivity(activityTask, reportAction);
-
-                if (activitySucceededAction != null)
-                    activitySucceededAction(activityTask);
-
-                return true;
+                return InvokeWorkflowActivity(
+                                              activityTask,
+                                              activitySucceededAction,
+                                              activityFailedAction);
             }
             catch (Exception e)
             {
-                activityTask.Status = ActivityStatus.Failed;
-
-                if (activityFailedAction != null)
-                    activityFailedAction(activityTask, e);
-
                 Console.WriteLine(e.ToString());
-
                 return false;
             }
         }
 
 
-        private static void InvokeWorkflowActivity(ActivityTaskDto activityTask, Action<ActivityReport> reportAction = null)
+        private bool InvokeWorkflowActivity(ActivityTaskDto activityTask,
+                                            Action<ActivityTaskDto> activitySucceededAction = null,
+                                            Action<ActivityTaskDto, string> activityFailedAction = null)
         {
+            var succeeded = true;
 
-            //var parameters = new Dictionary<string, object>
-            //                     {
-            //                         { "DeployTaskId", activityTask.TaskId },
-            //                         { "DeployTaskVersion", activityTask.DeployVersion }
-            //                     };
+            _workflowRunner.Run(
+                                activityTask.ActivityCode,
+                                waitForCompletion: true,
+                                onSucceed: _ =>
+                                {
+                                    succeeded = true;
+                                    activityTask.Status = ActivityStatus.Completed;
+                                    
+                                    if (activitySucceededAction != null)
+                                        activitySucceededAction(activityTask);
+                                },
+                                onFailure: errorMsg =>
+                                {
+                                    activityTask.Status = ActivityStatus.Failed;
+                                    succeeded = false;
 
-            //TODO: The DeployController uses a WorkflowRunner, make it reusable and use it even here.
-            var invoker = CreateWorkflowInvoker(activityTask, reportAction);
-            invoker.Invoke();
+                                    if (activityFailedAction != null)
+                                        activityFailedAction(activityTask, errorMsg);
 
-            activityTask.Status = ActivityStatus.Completed;
-        }
+                                    Console.WriteLine(errorMsg);
+                                });
 
-
-        private static WorkflowInvoker CreateWorkflowInvoker(ActivityTaskDto activityTask, Action<ActivityReport> reportAction)
-        {
-            var invoker = new WorkflowInvoker(LoadActivity(activityTask));
-            invoker.Extensions.Add(CreateTrackingParticipant(reportAction));
-            return invoker;
-        }
-
-
-        private static PolymeliaTrackingParticipant CreateTrackingParticipant(Action<ActivityReport> reportAction)
-        {
-            const String ALL = "*";
-
-            return new PolymeliaTrackingParticipant(reportAction)
-            {
-                TrackingProfile = new TrackingProfile
-                {
-                    Name = "CustomTrackingProfile",
-                    Queries = 
-                    {
-                        new CustomTrackingQuery { Name = ALL, ActivityName = ALL }
-                    }
-                }
-            };
-        }
-
-
-        private static System.Activities.Activity LoadActivity(ActivityTaskDto activityTask)
-        {
-            using (var reader = new StringReader(activityTask.ActivityCode))
-                return ActivityXamlServices.Load(reader);
+            return succeeded;
         }
     }
 }

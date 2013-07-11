@@ -56,7 +56,6 @@ namespace PolymeliaDeploy.Agent
             {
                 var lastestExecutedTaskId = _taskActivityExecutioner.ExecuteTasks(
                                                                                   tasks,
-                                                                                  Report,
                                                                                   ActivityTaskSucceded,
                                                                                   ActivityTaskFailed);
 
@@ -66,19 +65,11 @@ namespace PolymeliaDeploy.Agent
         }
 
 
-        private void ActivityTaskFailed(ActivityTaskDto activityTask, Exception e)
+        private void ActivityTaskFailed(ActivityTaskDto activityTask, string errorMsg)
         {
             _deployControllerClient.UpdateActivityTaskStatus(activityTask.Id, ActivityStatus.Failed);
 
-            Report(new ActivityReport
-                {
-                    TaskId = activityTask.TaskId,
-                    ServerRole = activityTask.ServerRole,
-                    MachineName = System.Environment.MachineName,
-                    Status = ReportStatus.Error,
-                    ActivityName = activityTask.ActivityName,
-                    Message = e.ToString(),
-                });
+            Report(CreateActiveReport(activityTask, errorMsg, ReportStatus.Error));
         }
 
 
@@ -86,21 +77,30 @@ namespace PolymeliaDeploy.Agent
         {
             _deployControllerClient.UpdateActivityTaskStatus(activityTask.Id, ActivityStatus.Completed);
 
-           Report(new ActivityReport
-                {
-                    TaskId = activityTask.TaskId,
-                    ServerRole = activityTask.ServerRole,
-                    MachineName = System.Environment.MachineName,
-                    Status = ReportStatus.Information,
-                    ActivityName = activityTask.ActivityName,
-                    Message = string.Format("Activity '{0}' completed!", activityTask.ActivityName)
-                });
+            Report(CreateActiveReport(
+                                      activityTask,
+                                      string.Format("Activity '{0}' completed!", activityTask.ActivityName),
+                                      ReportStatus.Information));
         }
 
 
         private void Report(ActivityReport ar)
         {
             _deployControllerClient.Report(ar);
+        }
+
+
+        private static ActivityReport CreateActiveReport(ActivityTaskDto activityTask, string msg, ReportStatus reportStatus)
+        {
+            return new ActivityReport
+            {
+                TaskId = activityTask.TaskId,
+                ServerRole = activityTask.ServerRole,
+                MachineName = System.Environment.MachineName,
+                Status = reportStatus,
+                ActivityName = activityTask.ActivityName,
+                Message = msg,
+            };
         }
 
 

@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
     using System.Linq;
 
     using Nancy;
@@ -11,8 +12,7 @@
     using PolymeliaDeploy.ApiDto;
     using PolymeliaDeploy.Controller;
     using PolymeliaDeploy.Data;
-
-    using PolymeliaDeployController.Workflow;
+    using PolymeliaDeploy.Workflow;
 
     public class ActivitiesModule : NancyModule
     {
@@ -101,7 +101,7 @@
 
                     db.SaveChanges();
 
-                    return this.Response.AsJson(activityTask);
+                    return Response.AsJson(activityTask);
                 }
             };
 
@@ -112,18 +112,51 @@
 
                 DeployServices.ReportClient = new ReportLocalClient();
 
-                var db = new PolymeliaDeployDbContext();
+                var deployVariables = new Collection<DeployVariable>();
+                
+                using (var db = new PolymeliaDeployDbContext())
+                {
+                    db.MainActivities.Add(mainActivity);
+                    db.SaveChanges();
+                
+                    foreach (var variable in db.Variables.Where( v => v.EnvironmentId == mainActivity.EnvironmentId))
+                    {
+                        var deployVariable = CreateDeployVariable(mainActivity, variable);
+                        deployVariables.Add(deployVariable);
 
-                db.MainActivities.Add(mainActivity);
-                db.SaveChanges();
-                db.Dispose();
+                        db.DeployVariables.Add(deployVariable);
+                    }
 
-                new WorkflowRunner().Run(mainActivity);
+                    db.SaveChanges();
+                }
 
-                return this.Response.AsJson(mainActivity.Id);
+
+
+                var parameters = new Dictionary<string, object>
+                                 {
+                                     { "DeployTaskId", mainActivity.Id },
+                                     { "DeployTaskVersion", mainActivity.Version },
+                                     { "DeployVariables", deployVariables },
+                                     { "DeployEnvironment", mainActivity.Environment }
+                                 };
+
+
+                new WorkflowRunner().Run(mainActivity.DeployActivity, parameters);
+
+                return Response.AsJson(mainActivity.Id);
             };
         }
 
+        private static DeployVariable CreateDeployVariable(MainActivity mainActivity, Variable variable)
+        {
+            return new DeployVariable
+                   {
+                       TaskId = mainActivity.Id,
+                       VariableKey = variable.VariableKey,
+                       VariableValue = variable.VariableValue,
+                       Scope = variable.Scope
+                   };
+        }
 
         private static IDictionary<string, string> GetEnvironmentVariables(PolymeliaDeployDbContext db, MainActivity maintask)
         {

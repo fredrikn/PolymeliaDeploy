@@ -31,5 +31,7 @@
         public string ActivityName { get; set; }
 
         public ActivityStatus Status { get; set; }
+
+        public string Environment { get; set; }
     }
 }

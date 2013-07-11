@@ -36,6 +36,8 @@ namespace PolymeliaDeploy.Data
 
         public string ServerRole { get; set; }
 
+        public string Environment { get; set; }
+
         public string MachineName { get; set; }
 
         public ReportStatus Status { get; set; }

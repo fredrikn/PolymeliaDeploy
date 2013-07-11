@@ -11,6 +11,8 @@
 
         public int EnvironmentId { get; set; }
 
+        public string Environment { get; set; }
+
         public string DeployActivity { get; set; }
 
         public string CreatedBy { get; set; }

@@ -29,5 +29,7 @@
         public DbSet<Environment> Environments { get; set; }
 
         public DbSet<Variable> Variables { get; set; }
+
+        public DbSet<DeployVariable> DeployVariables { get; set; }
     }
 }
