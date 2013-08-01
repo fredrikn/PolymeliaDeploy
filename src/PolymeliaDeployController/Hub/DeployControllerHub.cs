@@ -28,12 +28,12 @@ namespace PolymeliaDeployController.Hub
         }
         
 
-        public void SendMessage(string message)
-        {
-            Console.WriteLine(string.Format("{0}: {1}", GetAgentIpAddress(), message));
-            string it = new string(message.Reverse().ToArray());
-            Clients.All.broadCastToClients(it);
-        }
+        //public void SendMessage(string message)
+        //{
+        //    Console.WriteLine(string.Format("{0}: {1}", GetAgentIpAddress(), message));
+        //    string it = new string(message.Reverse().ToArray());
+        //    Clients.All.broadCastToClients(it);
+        //}
 
 
         public async Task Report(ActivityReport report)
@@ -52,8 +52,6 @@ namespace PolymeliaDeployController.Hub
         {
             var activites = await _activityRepository.GetActivityTasks(lastTaskId, serverRole);
 
-            //var variablesForEnvironment = GetEnvironmentVariables(db, maintask);
-
             var actititiesToRun = activites.ToList().Select(a => new ActivityTaskDto
             {
                 TaskId = a.TaskId,
@@ -65,7 +63,6 @@ namespace PolymeliaDeployController.Hub
                 CreatedBy = a.CreatedBy,
                 ServerRole = a.ServerRole,
                 Status = a.Status,
-                //Variables = variablesForEnvironment
             });
 
             if (!actititiesToRun.Any(a => a.Status == ActivityStatus.Failed ||
@@ -104,8 +101,6 @@ namespace PolymeliaDeployController.Hub
 
             return base.OnDisconnected();
         }
-
-
 
 
         protected string GetAgentIpAddress()

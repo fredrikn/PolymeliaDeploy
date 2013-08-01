@@ -23,8 +23,6 @@ namespace PolymeliaDeploy.ApiDto
 
         public string ActivityName { get; set; }
 
-        public IDictionary<string, string> Variables { get; set; }
-
         public ActivityStatus Status { get; set; }
     }
 }

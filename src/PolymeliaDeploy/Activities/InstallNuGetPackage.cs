@@ -130,28 +130,37 @@
             }
         }
 
+
         private Dictionary<string, object> CreatePowerShellScriptVariables(NativeActivityContext context)
         {
-            //TODO: Add varaibles, using the PolymeliaActivityContext
+            var activityContext = PolymeliaActivityContext.Current;
 
-            //var variables = new Dictionary<string, object>(DeployVariables)
-            //                    {
-            //                        { "PolymeliaVersion", Version },
-            //                        { "PolymeliaEnvironment", context.GetValue(this.ConfigurationEnvironment) },
-            //                        { "PolymeliaMachineName", System.Environment.MachineName },
-            //                        { "PolymeliaTaskId", TaskId },
-            //                        { "PolymeliaDestinationPath", _destinationFolder },
-            //                        { "PolymeliaPackageName", context.GetValue(PackageName) },
-            //                        { "PolymeliaPackageVersion", _packageVersion }
-            //                    };
+            var variables = new Dictionary<string, object>()
+                                {
+                                    { "PolymeliaVersion", activityContext.DeployVersion },
+                                    { "PolymeliaEnvironment", activityContext.Environment },
+                                    { "PolymeliaMachineName", System.Environment.MachineName },
+                                    { "PolymeliaTaskId", activityContext.TaskId },
+                                    { "PolymeliaDestinationPath", _destinationFolder },
+                                    { "PolymeliaPackageName", context.GetValue(PackageName) },
+                                    { "PolymeliaPackageVersion", _packageVersion }
+                                };
 
-            //foreach (var variable in this.Variables)
-            //    variables.Add(variable.Name, variable.Default);
+            foreach (var variable in activityContext.Variables)
+                variables.Add(variable.VariableKey, variable.VariableValue);
 
-            //return variables;
+            //Global environment variables will be replaced with local Activity variable if they have the same key
+            foreach (var variable in this.Variables)
+            {
+                if (variables.ContainsKey(variable.Name))
+                    variables[variable.Name] = variable.Default;
+                else
+                    variables.Add(variable.Name, variable.Default);
+            }
 
-            return new Dictionary<string, object>();
+            return variables;
         }
+
 
         private void DecompressAndRemovePacakgeFile(string fileToUnzip)
         {

@@ -18,51 +18,6 @@
     {
         public ActivitiesModule()
         {
-            Get["activities/{ServerRole}/{LastTaskId}"] = param =>
-            {
-                using (var db = new PolymeliaDeployDbContext())
-                {
-                    string serverRole = param.ServerRole;
-                    long lastTaskId = param.LastTaskId;
-
-                    var maintask = db.MainActivities.Where(t => t.Id > lastTaskId &&
-                                                          (t.Status != ActivityStatus.Failed || 
-                                                           t.Status != ActivityStatus.Canceled))
-                                                    .OrderByDescending(t => t.Id)
-                                                    .FirstOrDefault();
-
-                    if (maintask != null)
-                    {
-                        var activites = db.ActivityTasks.Where(t => t.ServerRole == serverRole &&
-                                                                    t.TaskId == maintask.Id)
-                                                        .OrderBy(t => t.Id);
-
-                        var variablesForEnvironment = GetEnvironmentVariables(db, maintask);
-
-                        var actititiesToRun = activites.ToList().Select(a => new ActivityTaskDto
-                                                                   {
-                                                                       TaskId = a.TaskId,
-                                                                       Id = a.Id,
-                                                                       ActivityCode = a.ActivityCode,
-                                                                       ActivityName = a.ActivityName,
-                                                                       DeployVersion = maintask.Version,
-                                                                       Created = a.Created,
-                                                                       CreatedBy = a.CreatedBy,
-                                                                       ServerRole = a.ServerRole,
-                                                                       Status = a.Status,
-                                                                       Variables = variablesForEnvironment
-                                                                   });
-
-                        if (!actititiesToRun.Any(a => a.Status == ActivityStatus.Failed || 
-                            a.Status == ActivityStatus.Canceled))
-                            return Response.AsJson(actititiesToRun);
-                    }
-
-                    return Response.AsJson(new List<ActivityTaskDto>());
-                }
-            };
-
-
             Get["deploys/last/{ProjectId}/{EnvironmentId}"] = param =>
             {
                 using (var db = new PolymeliaDeployDbContext())
