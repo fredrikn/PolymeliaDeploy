@@ -1,6 +1,7 @@
 ﻿namespace PolymeliaDeploy.Management
 {
     using System;
+    using System.Linq;
     using System.Management;
 
     public static class ResourceType
@@ -182,13 +183,10 @@
 
 
 
-        public static bool JobCompleted(
+        public static void JobCompleted(
                                         ManagementBaseObject outParams,
-                                        ManagementScope scope,
-                                        Action<string> jobError)
+                                        ManagementScope scope)
         {
-            var jobCompleted = true;
-
             //Retrieve msvc_StorageJob path. This is a full wmi path
             var JobPath = (string)outParams["Job"];
             var Job = new ManagementObject(scope, new ManagementPath(JobPath), null);
@@ -205,17 +203,10 @@
             }
 
             //Figure out if job failed
-            UInt16 jobState = (UInt16)Job["JobState"];
+            var jobState = (UInt16)Job["JobState"];
 
             if (jobState != JobState.Completed)
-            {
-                if (jobError != null)
-                    jobError(String.Format("Error Code:{0}, Descirption: {1}", (UInt16)Job["ErrorCode"], Job["ErrorDescription"]));
-
-                jobCompleted = false;
-            }
-
-            return jobCompleted;
+                throw new ApplicationException(String.Format("Error Code:{0}, Description: {1}", (UInt16)Job["ErrorCode"], Job["ErrorDescription"]));
         }
 
 
@@ -225,24 +216,16 @@
 
             scope.Connect();
 
-            ManagementObjectSearcher searcher = new ManagementObjectSearcher(scope, new ObjectQuery(query));
+            var searcher = new ManagementObjectSearcher(scope, new ObjectQuery(query));
 
-            ManagementObjectCollection computers = searcher.Get();
+            var computers = searcher.Get();
 
-            ManagementObject computer = null;
-
-            foreach (ManagementObject instance in computers)
-            {
-                computer = instance;
-                break;
-            }
-            return computer;
+            return computers.Cast<ManagementObject>().FirstOrDefault();
         }
 
         public static ManagementObject GetVirtualSystemSettingData(ManagementObject vm)
         {
-            ManagementObject vmSetting = null;
-            ManagementObjectCollection vmSettings = vm.GetRelated
+            var vmSettings = vm.GetRelated
             (
                 "Msvm_VirtualSystemSettingData",
                 "Msvm_SettingsDefineState",
@@ -255,17 +238,9 @@
             );
 
             if (vmSettings.Count != 1)
-            {
                 throw new Exception(String.Format("{0} instance of Msvm_VirtualSystemSettingData was found", vmSettings.Count));
-            }
 
-            foreach (ManagementObject instance in vmSettings)
-            {
-                vmSetting = instance;
-                break;
-            }
-
-            return vmSetting;
+            return vmSettings.Cast<ManagementObject>().FirstOrDefault();
         }
 
 
@@ -312,9 +287,9 @@
                                              resourceType, resourceSubType);
             }
 
-            ManagementObjectSearcher searcher = new ManagementObjectSearcher(scope, new ObjectQuery(query));
+            var searcher = new ManagementObjectSearcher(scope, new ObjectQuery(query));
 
-            ManagementObjectCollection poolResources = searcher.Get();
+            var poolResources = searcher.Get();
 
             //Get pool resource allocation ability
             if (poolResources.Count == 1)

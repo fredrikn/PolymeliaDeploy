@@ -98,7 +98,7 @@
             Console.WriteLine(msg);
 
             if (onFailure != null)
-                onFailure(msg);
+                onFailure(e.UnhandledException.Message);
         }
 
         private static void OnAborted(WorkflowApplicationAbortedEventArgs e)
@@ -116,15 +116,11 @@
             {
                 Console.WriteLine("Workflow {0} Terminated.", e.InstanceId);
                 
-                
                 var msg = string.Format(
                                         "Exception: {0}\n{1}",
                                         e.TerminationException.GetType().FullName,
                                         e.TerminationException.Message);
                 Console.WriteLine(msg);
-
-                if (onFailure != null)
-                    onFailure(msg);
             }
 
             else if (e.CompletionState == ActivityInstanceState.Canceled)

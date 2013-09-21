@@ -43,7 +43,7 @@
 
         private string _destinationFolder;
 
-        private ReportRemoteClient reportRemoteClient;
+        private readonly ReportRemoteClient reportRemoteClient;
 
 
         public InstallNuGetPackage()
@@ -116,11 +116,17 @@
                                                                    _destinationFolder,
                                                                    variables);
 
-                LogInformation("Succeed to call PowerShell scriptName '{0}' for package '{1}' with the output: {2}{3}", scriptName, context.GetValue(this.PackageName), System.Environment.NewLine, output);
+                LogInformation("Succeed to call PowerShell scriptName '{0}' for package '{1}' with the output: {2}{3}",
+                                scriptName,
+                                context.GetValue(PackageName),
+                                System.Environment.NewLine, output);
             }
             catch (Exception e)
             {
-                LogError("Failed to call PowerShell scriptName '{0}' for package '{1}' with the output: {2}{3}", scriptName, context.GetValue(this.PackageName), System.Environment.NewLine, e.Message);
+                LogError("Failed to call PowerShell scriptName '{0}' for package '{1}' with the output: {2}{3}",
+                        scriptName,
+                        context.GetValue(PackageName),
+                        System.Environment.NewLine, e.Message);
                 throw;
             }
             finally
@@ -135,7 +141,7 @@
         {
             var activityContext = PolymeliaActivityContext.Current;
 
-            var variables = new Dictionary<string, object>()
+            var variables = new Dictionary<string, object>
                                 {
                                     { "PolymeliaVersion", activityContext.DeployVersion },
                                     { "PolymeliaEnvironment", activityContext.Environment },
@@ -150,7 +156,7 @@
                 variables.Add(variable.VariableKey, variable.VariableValue);
 
             //Global environment variables will be replaced with local Activity variable if they have the same key
-            foreach (var variable in this.Variables)
+            foreach (var variable in Variables)
             {
                 if (variables.ContainsKey(variable.Name))
                     variables[variable.Name] = variable.Default;
@@ -162,7 +168,7 @@
         }
 
 
-        private void DecompressAndRemovePacakgeFile(string fileToUnzip)
+        private static void DecompressAndRemovePacakgeFile(string fileToUnzip)
         {
             var fileInfo = new FileInfo(fileToUnzip);
 
@@ -190,19 +196,19 @@
 
         private string RetrieveNuGetPackage(NativeActivityContext context)
         {
-            var packageRepository = new DataServicePackageRepository(new Uri(context.GetValue(this.NuGetServerPath)));
+            var packageRepository = new DataServicePackageRepository(new Uri(context.GetValue(NuGetServerPath)));
 
             DataServicePackage nugetPackage;
 
-            if (!string.IsNullOrWhiteSpace(context.GetValue(this.Version)))
+            if (!string.IsNullOrWhiteSpace(context.GetValue(Version)))
             {
                 nugetPackage = packageRepository.FindPackage(
-                                                            context.GetValue(this.PackageName),
-                                                            new SemanticVersion(context.GetValue(this.Version))) as DataServicePackage;
+                                                            context.GetValue(PackageName),
+                                                            new SemanticVersion(context.GetValue(Version))) as DataServicePackage;
             }
             else
             {
-                nugetPackage = packageRepository.FindPackage(context.GetValue(this.PackageName)) as DataServicePackage;
+                nugetPackage = packageRepository.FindPackage(context.GetValue(PackageName)) as DataServicePackage;
             }
 
             if (nugetPackage == null)
@@ -210,22 +216,22 @@
                 throw new ApplicationException(
                     string.Format(
                         "Can't find package '{0}' version '{1}' in the artifact repository on URI '{2}'",
-                        context.GetValue(this.PackageName),
-                        context.GetValue(this.Version),
-                        context.GetValue(this.NuGetServerPath)));
+                        context.GetValue(PackageName),
+                        context.GetValue(Version),
+                        context.GetValue(NuGetServerPath)));
             }
 
-            var packageSource = this.DownloadPackage(nugetPackage, context);
+            var packageSource = DownloadPackage(nugetPackage);
 
-            this._packageVersion = nugetPackage.Version;
+            _packageVersion = nugetPackage.Version;
 
             return packageSource;
         }
 
 
-        private string DownloadPackage(DataServicePackage nugetPackage, NativeActivityContext context)
+        private string DownloadPackage(DataServicePackage nugetPackage)
         {
-            var packageDestinationPath = Path.Combine(this._destinationFolder, nugetPackage.GetFullName() + ".nupkg");
+            var packageDestinationPath = Path.Combine(_destinationFolder, nugetPackage.GetFullName() + ".nupkg");
 
             var fileStream = new FileStream(packageDestinationPath, FileMode.Create);
 
@@ -261,7 +267,9 @@
 
                 if (!File.Exists(rootApplicationConfigFilePath))
                 {
-                    LogInformation("There was no root configuration file '{0}' for the package '{1}', no transformation will take place.", rootApplicationConfigFilePath, context.GetValue(this.PackageName));
+                    LogInformation("There was no root configuration file '{0}' for the package '{1}', no transformation will take place.",
+                                    rootApplicationConfigFilePath,
+                                    context.GetValue(PackageName));
                     continue;
                 }
 
@@ -292,11 +300,11 @@
             var rootApplicationConfigFile = new XmlDocument();
             rootApplicationConfigFile.Load(rootApplicationConfigFilePath);
 
-            this.LogInformation("Start to transform config '{0}' with config '{1}' for the package '{2}'", environmentConfigFile.FullName, rootApplicationConfigFilePath, context.GetValue(this.PackageName));
+            LogInformation("Start to transform config '{0}' with config '{1}' for the package '{2}'", environmentConfigFile.FullName, rootApplicationConfigFilePath, context.GetValue(this.PackageName));
 
-            this.TransformConfig(environmentConfigFile, rootApplicationConfigFile);
+            TransformConfig(environmentConfigFile, rootApplicationConfigFile);
 
-            this.LogInformation("Succeed to transform config '{0}' with config '{1}' for the package '{2}'", environmentConfigFile.FullName, rootApplicationConfigFilePath, context.GetValue(this.PackageName));
+            LogInformation("Succeed to transform config '{0}' with config '{1}' for the package '{2}'", environmentConfigFile.FullName, rootApplicationConfigFilePath, context.GetValue(this.PackageName));
 
             rootApplicationConfigFile.Save(rootApplicationConfigFilePath);
         }
@@ -313,14 +321,14 @@
         {
             var directory = new DirectoryInfo(packageDirectory);
 
-            LogInformation("Start to locate configuration files at path '{0}' for the package '{1}'", packageDirectory, context.GetValue(this.PackageName));
+            LogInformation("Start to locate configuration files at path '{0}' for the package '{1}'", packageDirectory, context.GetValue(PackageName));
 
             var files = directory.GetFiles(string.Format("*.config"), SearchOption.AllDirectories);
 
-            if (files == null || files.Length == 0)
-                this.LogInformation("No configuration files at path '{0}' for the package '{1}' was found", packageDirectory, context.GetValue(this.PackageName));
+            if (files.Length == 0)
+                LogInformation("No configuration files at path '{0}' for the package '{1}' was found", packageDirectory, context.GetValue(PackageName));
             else
-                this.LogInformation("Succeeded to find {0} configuration files at path '{1}' for the package '{2}' was found", files.Length, packageDirectory, context.GetValue(this.PackageName));
+                LogInformation("Succeeded to find {0} configuration files at path '{1}' for the package '{2}' was found", files.Length, packageDirectory, context.GetValue(PackageName));
 
             return files;
         }
@@ -336,14 +344,14 @@
         {
             //TODO: Replace with markers/substitute $(key
             
-            this.LogInformation("Start to replace configuration file values for the package '{0}'", context.GetValue(this.PackageName));
+            LogInformation("Start to replace configuration file values for the package '{0}'", context.GetValue(PackageName));
 
-            this.UpdateConfigSection("//appSettings/add", "key", "value", doc);
-            this.UpdateConfigSection("//connectionStrings/add", "name", "connectionString", doc);
-            this.UpdateConfigSection("//system.serviceModel/client/endpoint", "name", "address", doc);
-            this.UpdateConfigSection("//system.serviceModel/services/service/endpoint", "name", "address", doc);
+            UpdateConfigSection("//appSettings/add", "key", "value", doc);
+            UpdateConfigSection("//connectionStrings/add", "name", "connectionString", doc);
+            UpdateConfigSection("//system.serviceModel/client/endpoint", "name", "address", doc);
+            UpdateConfigSection("//system.serviceModel/services/service/endpoint", "name", "address", doc);
 
-            this.LogInformation("Succeed to replace configuration file values for the package '{0}'", context.GetValue(this.PackageName));
+            LogInformation("Succeed to replace configuration file values for the package '{0}'", context.GetValue(PackageName));
         }
 
 

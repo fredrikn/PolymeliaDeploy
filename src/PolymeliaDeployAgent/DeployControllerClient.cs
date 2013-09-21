@@ -19,7 +19,10 @@ namespace PolymeliaDeploy.Agent
         private string _serverRole;
 
 
-        public async Task Connect(string url, string serverRole)
+        public Action<IEnumerable<ActivityTaskDto>> OnRunActivity { get; set; }
+
+
+        public async Task Connect(string url, long lastTaskId, string serverRole)
         {
             if (string.IsNullOrWhiteSpace(url)) throw new ArgumentNullException("url");
             if (string.IsNullOrWhiteSpace(serverRole)) throw new ArgumentNullException("serverRole");
@@ -29,33 +32,26 @@ namespace PolymeliaDeploy.Agent
             if (_isRunning)
                 return;
 
-            await ConnectToDeployControllerHub(url, serverRole);
+            await ConnectToDeployControllerHub(url, lastTaskId, serverRole);
+        }
 
-            _isRunning = true;
+
+        public void RunActivities(IEnumerable<ActivityTaskDto> activitiesToRun)
+        {
+            if (OnRunActivity != null)
+                OnRunActivity(activitiesToRun);
         }
 
 
         public async Task UpdateActivityTaskStatus(long activityTaskId, ActivityStatus status)
         {
-            EnsureClientIsConnected();
-
             await _hubProxy.Invoke("UpdateActivityTaskStatus", activityTaskId, status);
-        }
-
-
-        public async Task<IEnumerable<ActivityTaskDto>> GetActivityTasks(long lastTaskId)
-        {
-            EnsureClientIsConnected();
-
-            return await _hubProxy.Invoke<IEnumerable<ActivityTaskDto>>("GetActivityTasks", lastTaskId, _serverRole);
         }
 
 
         public async Task Report(ActivityReport report)
         {
             if (report == null) throw new ArgumentNullException("report");
-
-            EnsureClientIsConnected();
 
             await _hubProxy.Invoke("Report", report);
         }
@@ -81,21 +77,16 @@ namespace PolymeliaDeploy.Agent
         }
 
 
-        private async Task ConnectToDeployControllerHub(string url, string serverRole)
+        private async Task ConnectToDeployControllerHub(string url, long lastTaskId,  string serverRole)
         {
             _hubConnection = new HubConnection(url);
             _hubProxy = _hubConnection.CreateHubProxy("DeployControllerHub");
 
-            //_hubProxy.On("broadCastToClients", message => System.Console.WriteLine(message));
+           _hubProxy.On<IEnumerable<ActivityTaskDto>>("RunActivities", RunActivities);
 
             await _hubConnection.Start();
 
-            await _hubProxy.Invoke("Connect", serverRole, "Test");
-        }
-
-        private void EnsureClientIsConnected()
-        {
-            if (!_isRunning) throw new ApplicationException("You must first call Connect to connect to the Deploy Controller");
+            await _hubProxy.Invoke("Connect", serverRole, lastTaskId, _hubConnection.ConnectionId);
         }
     }
 }

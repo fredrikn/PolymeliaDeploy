@@ -84,6 +84,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Activities\Attributes\HideActivityAttribute.cs" />
     <Compile Include="Activities\StartAgentActivity.cs" />
     <Compile Include="Activities\InstallWindowsService.cs" />
     <Compile Include="Activities\CreateMsmqQueue.cs" />

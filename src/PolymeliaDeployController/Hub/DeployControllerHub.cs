@@ -28,12 +28,16 @@ namespace PolymeliaDeployController.Hub
         }
         
 
-        //public void SendMessage(string message)
-        //{
-        //    Console.WriteLine(string.Format("{0}: {1}", GetAgentIpAddress(), message));
-        //    string it = new string(message.Reverse().ToArray());
-        //    Clients.All.broadCastToClients(it);
-        //}
+        //TODO: Add some sort of key/certificate, authentication
+        public async Task Connect(string roleName, long lastTaskId, string connectionId)
+        {
+            Console.WriteLine("Agent from IP: '{0}' with role: '{1}' is now connected", GetAgentIpAddress(), roleName);
+
+            //TODO: Make sure to register connected agent.
+            RegisterAgent(roleName, connectionId);
+
+            await CheckForAgentActivityAndRunActivities(roleName, lastTaskId, connectionId);
+        }
 
 
         public async Task Report(ActivityReport report)
@@ -48,7 +52,32 @@ namespace PolymeliaDeployController.Hub
         }
 
 
-        public async Task<IEnumerable<ActivityTaskDto>> GetActivityTasks(int lastTaskId, string serverRole)
+        public override Task OnDisconnected()
+        {
+            var agentKey = _connectedAgents.Where(a => a.Value == Context.ConnectionId)
+                                           .Select( a => a.Key).FirstOrDefault();
+
+            if (agentKey != null)
+                _connectedAgents.Remove(agentKey);
+
+            //TODO: Add the agent that was disconnected
+            Console.WriteLine(string.Format("An Agent is now disconnected", GetAgentIpAddress()));
+
+            return base.OnDisconnected();
+        }
+
+
+        protected string GetAgentIpAddress()
+        {
+            var env = Get<IDictionary<string, object>>(Context.Request.Items, "owin.environment");
+
+            if (env == null) return null;
+
+            return Get<string>(env, "server.RemoteIpAddress");
+        }
+
+
+        private async Task<IEnumerable<ActivityTaskDto>> GetActivityTasks(long lastTaskId, string serverRole)
         {
             var activites = await _activityRepository.GetActivityTasks(lastTaskId, serverRole);
 
@@ -73,43 +102,23 @@ namespace PolymeliaDeployController.Hub
         }
 
 
-        //TODO: Add some sort of key/certificate, authentication
-        public void Connect(string roleName, string environment)
+        private void RegisterAgent(string roleName, string connectionId)
         {
-            Console.WriteLine(string.Format("Agent from IP: '{0}' with role: '{1}' for environment: '{2}' is now connected", GetAgentIpAddress(), roleName, environment));
+            var agentId = string.Format("{0}_{1}", roleName, connectionId);
 
-            //TODO: Make sure to register connected agent.
-
-            var agentId = string.Format("{0}_{1}", roleName, environment);
-            
-            if (!_connectedAgents.ContainsKey(agentId))
-                _connectedAgents.Add(agentId, Context.ConnectionId);
+            if (!_connectedAgents.ContainsKey(agentId)) _connectedAgents.Add(agentId, Context.ConnectionId);
         }
 
 
-
-        public override Task OnDisconnected()
+        private async Task CheckForAgentActivityAndRunActivities(string roleName, long lastTaskId, string connectionId)
         {
-            var agentKey = _connectedAgents.Where(a => a.Value == Context.ConnectionId)
-                                           .Select( a => a.Key).FirstOrDefault();
+            var activityTasks = await GetActivityTasks(lastTaskId, roleName);
 
-            if (agentKey != null)
-                _connectedAgents.Remove(agentKey);
+            var activityTaskDtos = activityTasks as IList<ActivityTaskDto> ?? activityTasks.ToList();
 
-            //TODO: Add the agent that was disconnected
-            Console.WriteLine(string.Format("An Agent is now disconnected", GetAgentIpAddress()));
-
-            return base.OnDisconnected();
+            if (activityTaskDtos.Any()) await Clients.Client(connectionId).RunActivities(activityTaskDtos);
         }
 
-
-        protected string GetAgentIpAddress()
-        {
-            var env = Get<IDictionary<string, object>>(Context.Request.Items, "owin.environment");
-            if (env == null) return null;
-
-            return Get<string>(env, "server.RemoteIpAddress");
-        }
 
         private static T Get<T>(IDictionary<string, object> env, string key)
         {

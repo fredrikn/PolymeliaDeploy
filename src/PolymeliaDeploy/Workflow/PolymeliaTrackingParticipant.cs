@@ -9,7 +9,7 @@ namespace PolymeliaDeploy.Workflow
 
     public class PolymeliaTrackingParticipant : TrackingParticipant
     {
-        private IDeployConrollerReportClient _reportClient;
+        private readonly IDeployConrollerReportClient _reportClient;
 
         public PolymeliaTrackingParticipant(IDeployConrollerReportClient reportClient)
         {
@@ -24,19 +24,19 @@ namespace PolymeliaDeploy.Workflow
         {
             var customTrackingRecord = record as CustomTrackingRecord;
 
-            if ((customTrackingRecord != null) && (customTrackingRecord.Data.Count > 0))
-            {
-                if (customTrackingRecord.Data.ContainsKey("Record"))
-                {
-                    var activityReport = customTrackingRecord.Data["Record"] as ActivityReport;
+            if ((customTrackingRecord == null) || (customTrackingRecord.Data.Count <= 0))
+                return;
 
-                    if (activityReport != null)
-                    {
-                        Console.WriteLine(activityReport.Message);
-                        _reportClient.Report(activityReport);
-                    }
-                }
-            }
+            if (!customTrackingRecord.Data.ContainsKey("Record"))
+                return;
+            
+            var activityReport = customTrackingRecord.Data["Record"] as ActivityReport;
+
+            if (activityReport == null)
+                return;
+            
+            Console.WriteLine(activityReport.Message);
+            _reportClient.Report(activityReport);
         }
     }
 }

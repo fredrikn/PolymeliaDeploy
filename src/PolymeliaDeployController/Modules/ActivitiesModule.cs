@@ -86,7 +86,6 @@
                 }
 
 
-
                 var parameters = new Dictionary<string, object>
                                  {
                                      { "DeployTaskId", mainActivity.Id },

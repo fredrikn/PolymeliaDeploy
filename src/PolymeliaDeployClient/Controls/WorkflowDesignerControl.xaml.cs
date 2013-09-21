@@ -16,6 +16,9 @@ namespace PolymeliaDeployClient.Controls
 
     using PolymeliaDeploy.Activities;
     using System.Activities.Presentation.Validation;
+
+    using PolymeliaDeploy.Activities.Attributes;
+
     using PolymeliaDeployClient.Workflow;
     using System.Activities;
 
@@ -84,7 +87,7 @@ namespace PolymeliaDeployClient.Controls
                 foreach (
                     var type in
                         assembly.GetTypes()
-                                .Where(t => t != typeof(Start) && t.IsSubclassOf(typeof(PolymeliaNativiveActivity)))
+                                .Where(t => t.IsSubclassOf(typeof(PolymeliaNativiveActivity)) && !IsHiddenActivity(t))
                                 .ToList())
                 {
                     var displayName = GetToolBoxItemDisplayName(type);
@@ -129,6 +132,13 @@ namespace PolymeliaDeployClient.Controls
                 categoryName = categoryNames.First().Category;
 
             return categoryName;
+        }
+
+
+        private static bool IsHiddenActivity(Type type)
+        {
+            var categoryNames = type.GetCustomAttributes<HideActivityAttribute>();
+            return categoryNames.Any();
         }
 
 

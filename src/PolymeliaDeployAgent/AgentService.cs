@@ -4,13 +4,16 @@ using PolymeliaDeploy.ApiDto;
 using PolymeliaDeploy.Data;
 using PolymeliaDeploy.DeployController;
 using System;
-using System.Linq;
 
 namespace PolymeliaDeploy.Agent
 {
+    using System.Collections.Generic;
+
     public class AgentService : IAgentService
     {
         private bool _isDisposed;
+
+        private bool _activityIsRunning;
 
         private readonly IDeployControllerClient _deployControllerClient;
         private readonly IAgentConfigurationSettings _agentConfig;
@@ -37,31 +40,28 @@ namespace PolymeliaDeploy.Agent
 
         public void Start()
         {
+            _deployControllerClient.OnRunActivity = RunActivities;
+
             _deployControllerClient.Connect(
                                             _agentConfig.DeployControllerUrl,
-                                            _agentConfig.ServerRole)
-                                   .Wait();
-
-            ExecuteActivityTaskIfAvailable();
+                                            _recordLatestTask.GetValue(),
+                                            _agentConfig.ServerRole);
         }
 
 
-        private void ExecuteActivityTaskIfAvailable()
+        private void RunActivities(IEnumerable<ActivityTaskDto> activities)
         {
-            var lastTaskId = _recordLatestTask.GetValue();
+            _activityIsRunning = true;
 
-            var tasks = _deployControllerClient.GetActivityTasks(lastTaskId).Result.ToArray();
+            var lastestExecutedTaskId = _taskActivityExecutioner.ExecuteTasks(
+                                                                            activities,
+                                                                            ActivityTaskSucceded,
+                                                                            ActivityTaskFailed);
 
-            if (tasks.Any())
-            {
-                var lastestExecutedTaskId = _taskActivityExecutioner.ExecuteTasks(
-                                                                                  tasks,
-                                                                                  ActivityTaskSucceded,
-                                                                                  ActivityTaskFailed);
+            if (lastestExecutedTaskId.HasValue)
+                _recordLatestTask.SetValue(lastestExecutedTaskId.Value);
 
-                if (lastestExecutedTaskId.HasValue)
-                    _recordLatestTask.SetValue(lastestExecutedTaskId.Value);
-            }
+            _activityIsRunning = false;
         }
 
 

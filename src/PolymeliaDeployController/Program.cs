@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.ServiceProcess;
 
 namespace PolymeliaDeployController
@@ -12,7 +11,6 @@ namespace PolymeliaDeployController
     using PolymeliaDeploy;
     using PolymeliaDeploy.Controller;
     using PolymeliaDeploy.Data;
-    using PolymeliaDeploy.Network;
 
     static class Program
     {

@@ -5,15 +5,17 @@
     using System.ComponentModel;
     using System.Windows.Markup;
 
+    using PolymeliaDeploy.Activities.Attributes;
     using PolymeliaDeploy.Data;
 
+    [HideActivity]
     public sealed class StartAgentActivity : PolymeliaNativiveActivity
     {
-        private Collection<Activity> _activities = new Collection<Activity>();
+        private readonly Collection<Activity> _activities = new Collection<Activity>();
 
-        private Variable<int> _lastIndexHint;
+        private readonly Variable<int> _lastIndexHint;
 
-        private CompletionCallback _onChildComplete;
+        private readonly CompletionCallback _onChildComplete;
 
         private Collection<DeployVariable> _deployVariables = new Collection<DeployVariable>();
 

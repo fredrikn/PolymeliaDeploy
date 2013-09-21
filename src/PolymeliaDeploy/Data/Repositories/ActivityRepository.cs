@@ -29,7 +29,7 @@ namespace PolymeliaDeploy.Data.Repositories
         }
 
 
-        public async Task<IEnumerable<ActivityTask>> GetActivityTasks(int lastTaskId, string serverRole)
+        public async Task<IEnumerable<ActivityTask>> GetActivityTasks(long lastTaskId, string serverRole)
         {
             return await Task.Run(() =>
             {

@@ -5,17 +5,19 @@
     using System.ComponentModel;
     using System.Windows.Markup;
 
+    using PolymeliaDeploy.Activities.Attributes;
     using PolymeliaDeploy.Data;
 
+    [HideActivity]
     [Designer("System.Activities.Core.Presentation.SequenceDesigner, System.Activities.Core.Presentation")]
     [ContentProperty("Activities")]
     public sealed class Start : PolymeliaNativiveActivity
     {
-        private Collection<Activity> _activities = new Collection<Activity>();
+        private readonly Collection<Activity> _activities = new Collection<Activity>();
 
-        private Variable<int> _lastIndexHint;
+        private readonly Variable<int> _lastIndexHint;
 
-        private CompletionCallback _onChildComplete;
+        private readonly CompletionCallback _onChildComplete;
 
         private InArgument<Collection<DeployVariable>> _deployVariables = new InArgument<Collection<DeployVariable>>();
 
@@ -72,6 +74,7 @@
                 return;
 
             var activity = Activities[0];
+
             context.ScheduleActivity(activity, _onChildComplete);
         }
 
@@ -88,7 +91,9 @@
                 return;
 
             var activity = Activities[index2];
+            
             context.ScheduleActivity(activity, _onChildComplete);
+
             _lastIndexHint.Set(context, index2);
         }
     }

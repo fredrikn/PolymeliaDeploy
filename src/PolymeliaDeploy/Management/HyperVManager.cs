@@ -8,26 +8,23 @@ namespace PolymeliaDeploy.Management
     {
         public void StartMachine(
                                  string vmName,
-                                 Action<string> infortmationReport,
-                                 Action<string> errorReport)
+                                 Action<string> infortmationReport)
         {
-            RequestStateChange(vmName, "start", infortmationReport, errorReport);
+            RequestStateChange(vmName, "start", infortmationReport);
         }
 
         public void StopMachine(
                          string vmName,
-                         Action<string> infortmationReport,
-                         Action<string> errorReport)
+                         Action<string> infortmationReport)
         {
-            RequestStateChange(vmName, "stop", infortmationReport, errorReport);
+            RequestStateChange(vmName, "stop", infortmationReport);
         }
 
 
         private void RequestStateChange(
-                                       string vmName,
-                                       string action,
-                                       Action<string> infortmationReport,
-                                       Action<string> errorReport)
+            string vmName,
+            string action,
+            Action<string> infortmationReport)
         {
             var serverPath = string.Format(@"\\{0}\root\virtualization", Environment.MachineName);
 
@@ -71,19 +68,18 @@ namespace PolymeliaDeploy.Management
             switch ((UInt32)outParams["ReturnValue"])
             {
                 case ReturnCode.Started:
-                    if (Utility.JobCompleted(outParams, scope, errorReport))
+                    try
                     {
+                        Utility.JobCompleted(outParams, scope);
+
                         if (infortmationReport != null)
                             infortmationReport(string.Format("{0} state was changed successfully.", vmName));
 
                         Console.WriteLine("{0} state was changed successfully.", vmName);
                     }
-                    else
+                    catch (Exception e)
                     {
-                        if (errorReport != null)
-                            errorReport(string.Format("Failed to change virtual system state for '{0}'", vmName));
-
-                        throw new ApplicationException(string.Format("Failed to change virtual system state for '{0}'", vmName));
+                        throw new ApplicationException(string.Format("Failed to change virtual system state for '{0}'. Error:", vmName, e.Message));
                     }
                     break;
                 case ReturnCode.Completed:
@@ -96,9 +92,6 @@ namespace PolymeliaDeploy.Management
                     }
                 default:
                     {
-                        if (errorReport != null)
-                            errorReport(string.Format("Change virtual system state failed with error {0}", outParams["ReturnValue"]));
-
                         throw new ApplicationException(string.Format("Change virtual system state failed with error {0}", outParams["ReturnValue"]));
                     }
             }
