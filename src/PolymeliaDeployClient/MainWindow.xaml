@@ -128,7 +128,7 @@
 						Content="DASHBOARD"
 						Margin="10,0,15,0"
 						FontSize="11"
-						Style="{StaticResource linkButton}"/>
+						Style="{StaticResource linkButton}" Height="30" VerticalAlignment="Top" Click="viewDashboardButton_Click"/>
 
                     <Rectangle Height="14" Fill="White" Width="1"/>
 
@@ -229,7 +229,7 @@
         </Grid>
 
 
-        <Grid Grid.Row="1" Margin="0">
+        <Grid Grid.Row="1" Margin="0" Name="contentGrid">
 
             <TabControl
 				x:Name="environmentTabs"

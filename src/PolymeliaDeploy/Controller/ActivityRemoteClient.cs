@@ -7,6 +7,7 @@ namespace PolymeliaDeploy.Controller
     using System.Net.Http;
     using System.Net.Http.Formatting;
     using System.Net.Http.Headers;
+    using System.Threading.Tasks;
 
     using PolymeliaDeploy.ApiDto;
     using PolymeliaDeploy.Data;
@@ -37,6 +38,23 @@ namespace PolymeliaDeploy.Controller
             {
                 Console.WriteLine("Can't access deploy controller or read its results. " + e);
                 throw;
+            }
+        }
+
+
+        public async Task<IEnumerable<MainActivity>> GetDeployHistory(int projectId, int environmentId)
+        {
+            using (var client = new ControllerClientFactory().CreateWebHttpClient())
+            {
+                var requestUrl = string.Format("deploys/history/{0}/{1}", projectId, environmentId);
+
+                var response = await client.GetAsync(requestUrl);
+
+                if (response.IsSuccessStatusCode)
+                    return await response.Content.ReadAsAsync<IEnumerable<MainActivity>>();
+
+                throw new HttpRequestException(
+                    string.Format("{0} ({1})", (int)response.StatusCode, response.ReasonPhrase));
             }
         }
 

@@ -9,7 +9,6 @@
     using Nancy.ModelBinding;
 
     using PolymeliaDeploy;
-    using PolymeliaDeploy.ApiDto;
     using PolymeliaDeploy.Controller;
     using PolymeliaDeploy.Data;
     using PolymeliaDeploy.Workflow;
@@ -30,7 +29,24 @@
                                                     .OrderByDescending(m => m.Id)
                                                     .FirstOrDefault();
 
-                    return this.Response.AsJson(maintask);
+                    return Response.AsJson(maintask);
+                }
+            };
+
+
+            Get["deploys/history/{ProjectId}/{EnvironmentId}"] = param =>
+            {
+                using (var db = new PolymeliaDeployDbContext())
+                {
+                    int environmentId = int.Parse(param.EnvironmentId);
+                    int projectId = int.Parse(param.ProjectId);
+
+                    var maintasks = db.MainActivities.Where(m => m.ProjectId == projectId  &&
+                                                                 m.EnvironmentId == environmentId)
+                                                    .OrderByDescending(m => m.Id)
+                                                    .Take(5).ToList();
+
+                    return Response.AsJson(maintasks);
                 }
             };
 

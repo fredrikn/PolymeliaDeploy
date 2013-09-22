@@ -250,7 +250,6 @@ namespace PolymeliaDeployClient
             AddNewEnvironment();
 
             blockBackgroundGrid.Visibility = Visibility.Hidden;
-
         }
 
 
@@ -324,6 +323,25 @@ namespace PolymeliaDeployClient
             variables.ShowDialog();
 
             blockBackgroundGrid.Visibility = Visibility.Hidden;
+        }
+
+
+        private void viewDashboardButton_Click(object sender, RoutedEventArgs e)
+        {
+            foreach (var child in contentGrid.Children.OfType<Dashboard>())
+            {
+                child.Visibility = Visibility.Visible;
+                child.Environments = _environments;
+                child.LoadHistory();
+                return;
+            }
+            
+            var dashboard = new Dashboard();
+            
+            dashboard.Environments = _environments;
+            dashboard.LoadHistory();
+
+            contentGrid.Children.Add(dashboard);
         }
     }
 }

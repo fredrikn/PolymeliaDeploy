@@ -40,6 +40,7 @@ namespace PolymeliaDeploy.Agent
         public void SetValue(long value)
         {
             File.WriteAllText(_fileName, value.ToString(CultureInfo.InvariantCulture));
+            _latestTask = value;
         }
     }
 }

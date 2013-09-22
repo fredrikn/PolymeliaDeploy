@@ -29,13 +29,26 @@ namespace PolymeliaDeployController.Hub
         
 
         //TODO: Add some sort of key/certificate, authentication
-        public async Task Connect(string roleName, long lastTaskId, string connectionId)
+        public void Connect(string roleName, string connectionId)
         {
-            Console.WriteLine("Agent from IP: '{0}' with role: '{1}' is now connected", GetAgentIpAddress(), roleName);
-
-            //TODO: Make sure to register connected agent.
             RegisterAgent(roleName, connectionId);
 
+            Console.WriteLine("Agent from IP: '{0}' with role: '{1}' is now connected", GetAgentIpAddress(), roleName);
+        }
+
+
+        public void Deploy()
+        {
+            //Make sure Client connects to this hub and call this deploy method
+
+            //Run Workflow
+
+            //Get Agents for each ServerRole, send activities, register for completion. When all agents are green, the mark deployment as succeeded.
+        }
+
+
+        public async Task AgentIsReadyForNewTasks(long lastTaskId, string roleName, string connectionId)
+        {
             await CheckForAgentActivityAndRunActivities(roleName, lastTaskId, connectionId);
         }
 
@@ -60,7 +73,6 @@ namespace PolymeliaDeployController.Hub
             if (agentKey != null)
                 _connectedAgents.Remove(agentKey);
 
-            //TODO: Add the agent that was disconnected
             Console.WriteLine(string.Format("An Agent is now disconnected", GetAgentIpAddress()));
 
             return base.OnDisconnected();
@@ -71,11 +83,28 @@ namespace PolymeliaDeployController.Hub
         {
             var env = Get<IDictionary<string, object>>(Context.Request.Items, "owin.environment");
 
-            if (env == null) return null;
-
-            return Get<string>(env, "server.RemoteIpAddress");
+            return env == null ? null : Get<string>(env, "server.RemoteIpAddress");
         }
 
+
+        private void RegisterAgent(string roleName, string connectionId)
+        {
+            var agentId = string.Format("{0}_{1}", roleName, connectionId);
+
+            if (!_connectedAgents.ContainsKey(agentId))
+                _connectedAgents.Add(agentId, Context.ConnectionId);
+        }
+
+
+        private async Task CheckForAgentActivityAndRunActivities(string roleName, long lastTaskId, string connectionId)
+        {
+            var activityTasks = await GetActivityTasks(lastTaskId, roleName);
+
+            var activityTaskDtos = activityTasks as IList<ActivityTaskDto> ?? activityTasks.ToList();
+
+            if (activityTaskDtos.Any())
+                await Clients.Client(connectionId).RunActivities(activityTaskDtos);
+        }
 
         private async Task<IEnumerable<ActivityTaskDto>> GetActivityTasks(long lastTaskId, string serverRole)
         {
@@ -92,6 +121,7 @@ namespace PolymeliaDeployController.Hub
                 CreatedBy = a.CreatedBy,
                 ServerRole = a.ServerRole,
                 Status = a.Status,
+                Environment = a.Environment
             });
 
             if (!actititiesToRun.Any(a => a.Status == ActivityStatus.Failed ||
@@ -99,24 +129,6 @@ namespace PolymeliaDeployController.Hub
                 return actititiesToRun;
 
             return new List<ActivityTaskDto>();
-        }
-
-
-        private void RegisterAgent(string roleName, string connectionId)
-        {
-            var agentId = string.Format("{0}_{1}", roleName, connectionId);
-
-            if (!_connectedAgents.ContainsKey(agentId)) _connectedAgents.Add(agentId, Context.ConnectionId);
-        }
-
-
-        private async Task CheckForAgentActivityAndRunActivities(string roleName, long lastTaskId, string connectionId)
-        {
-            var activityTasks = await GetActivityTasks(lastTaskId, roleName);
-
-            var activityTaskDtos = activityTasks as IList<ActivityTaskDto> ?? activityTasks.ToList();
-
-            if (activityTaskDtos.Any()) await Clients.Client(connectionId).RunActivities(activityTaskDtos);
         }
 
 

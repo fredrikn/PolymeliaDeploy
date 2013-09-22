@@ -3,7 +3,6 @@
 namespace PolymeliaDeploy.ApiDto
 {
     using PolymeliaDeploy.Data;
-    using System.Collections.Generic;
 
     public class ActivityTaskDto
     {
@@ -12,6 +11,8 @@ namespace PolymeliaDeploy.ApiDto
         public long TaskId { get; set; }
 
         public string DeployVersion { get; set; }
+
+        public string Environment { get; set; }
 
         public string ServerRole { get; set; }
 

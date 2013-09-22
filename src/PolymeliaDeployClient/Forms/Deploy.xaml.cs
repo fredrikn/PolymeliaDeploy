@@ -10,7 +10,6 @@ namespace PolymeliaDeployClient.Forms
     using System.Windows.Controls;
     using System.Windows.Media;
 
-    using PolymeliaDeploy;
     using PolymeliaDeploy.Controller;
     using PolymeliaDeploy.Data;
 
