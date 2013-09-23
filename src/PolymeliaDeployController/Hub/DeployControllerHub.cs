@@ -110,7 +110,7 @@ namespace PolymeliaDeployController.Hub
 
         private void RegisterAgent(string roleName, string agentIpAddress, string serverName)
         {
-            var agent = _agentRepository.Get(roleName, agentIpAddress);
+            var agent = _agentRepository.Get(roleName, serverName);
 
             if (agent == null)
             {
@@ -150,6 +150,11 @@ namespace PolymeliaDeployController.Hub
                 SetCurrentAgentToBusy();
 
                 await Clients.Client(Context.ConnectionId).RunActivities(activityTaskDtos);
+
+                var agent = GetCurrentAgent();
+                agent.LastDeploymentId = activityTaskDtos.First().DeploymentId;
+
+                _agentRepository.Update(agent);
             }
         }
 
@@ -158,7 +163,7 @@ namespace PolymeliaDeployController.Hub
         {
             var agent = GetCurrentAgent();
 
-            var activites = await _activityRepository.GetActivityTasks(agent.LastActivityId == null ? 0 : agent.LastActivityId.Value, serverRole);
+            var activites = await _activityRepository.GetActivityTasks(agent.LastDeploymentId == null ? 0 : agent.LastDeploymentId.Value, serverRole);
 
             var actititiesToRun = activites.ToList().Select(a => new ActivityTaskDto
             {
@@ -216,7 +221,7 @@ namespace PolymeliaDeployController.Hub
 
         private static bool AreAllAgentsDoneWithActivity(long activityTaskId)
         {
-            return _connectedAgents.Values.Any(a => !a.IsBusy && a.IsActive && a.LastActivityId == activityTaskId);
+            return _connectedAgents.Values.Any(a => !a.IsBusy && a.IsActive && a.LastDeploymentId == activityTaskId);
         }
 
 

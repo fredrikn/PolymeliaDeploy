@@ -29,13 +29,13 @@ namespace PolymeliaDeploy.Data.Repositories
         }
 
 
-        public async Task<IEnumerable<ActivityTask>> GetActivityTasks(long lastTaskId, string serverRole)
+        public async Task<IEnumerable<ActivityTask>> GetActivityTasks(long lastDeploymentId, string serverRole)
         {
             return await Task.Run(() =>
             {
                 using (var db = new PolymeliaDeployDbContext())
                 {
-                    var maintask = db.Deployments.Where(t => t.Id > lastTaskId &&
+                    var maintask = db.Deployments.Where(t => t.Id > lastDeploymentId &&
                                                           (t.Status != ActivityStatus.Failed &&
                                                            t.Status != ActivityStatus.Canceled))
                                                     .OrderByDescending(t => t.Id)

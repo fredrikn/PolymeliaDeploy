@@ -21,7 +21,7 @@
         public bool IsActive { get; set; }
 
 
-        public long? LastActivityId { get; set; }
+        public long? LastDeploymentId { get; set; }
 
         [NotMapped]
         public bool IsBusy { get; set; }
