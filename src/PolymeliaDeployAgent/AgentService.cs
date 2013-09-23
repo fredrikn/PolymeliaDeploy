@@ -16,25 +16,21 @@ namespace PolymeliaDeploy.Agent
         private readonly IDeployControllerClient _deployControllerClient;
         private readonly IAgentConfigurationSettings _agentConfig;
         private readonly ITaskActivityExecutioner _taskActivityExecutioner;
-        private readonly IRecordLatestTask _recordLatestTask;
 
         private AgentStatus _agentStatus = AgentStatus.Ready;
 
         public AgentService(
                             IDeployControllerClient deployControllerClient,
                             IAgentConfigurationSettings agentConfig,
-                            ITaskActivityExecutioner taskActivityExecutioner,
-                            IRecordLatestTask recordLatestTask)
+                            ITaskActivityExecutioner taskActivityExecutioner)
         {
             if (deployControllerClient == null) throw new ArgumentNullException("deployControllerClient");
             if (agentConfig == null) throw new ArgumentNullException("agentConfig");
             if (taskActivityExecutioner == null) throw new ArgumentNullException("taskActivityExecutioner");
-            if (recordLatestTask == null) throw new ArgumentNullException("recordLatestTask");
 
             _deployControllerClient = deployControllerClient;
             _agentConfig = agentConfig;
             _taskActivityExecutioner = taskActivityExecutioner;
-            _recordLatestTask = recordLatestTask;
         }
 
 
@@ -54,7 +50,7 @@ namespace PolymeliaDeploy.Agent
             return () =>
             {
                 if (_agentStatus == AgentStatus.Ready)
-                    _deployControllerClient.AgentIsReadyForNewTasks(_recordLatestTask.GetValue());
+                    _deployControllerClient.AgentIsReadyForNewTasks();
             };
         }
 
@@ -63,22 +59,19 @@ namespace PolymeliaDeploy.Agent
         {
             _agentStatus = AgentStatus.InProgress;
 
-            var lastestExecutedTaskId = _taskActivityExecutioner.ExecuteTasks(
-                                                                              activities,
-                                                                              ActivityTaskSucceded,
-                                                                              ActivityTaskFailed);
-
-            if (lastestExecutedTaskId.HasValue)
-                _recordLatestTask.SetValue(lastestExecutedTaskId.Value);
+            _taskActivityExecutioner.ExecuteTasks(
+                                                  activities,
+                                                  ActivityTaskSucceded,
+                                                  ActivityTaskFailed);
 
             _agentStatus = AgentStatus.Ready;
-            _deployControllerClient.AgentIsReadyForNewTasks(_recordLatestTask.GetValue());
+            _deployControllerClient.AgentIsReadyForNewTasks();
         }
 
      
         private void ActivityTaskFailed(ActivityTaskDto activityTask, string errorMsg)
         {
-            _deployControllerClient.UpdateActivityTaskStatus(activityTask.Id, ActivityStatus.Failed);
+            _deployControllerClient.ActivityFailed(activityTask.Id);
 
             Report(CreateActiveReport(activityTask, errorMsg, ReportStatus.Error));
         }
@@ -86,7 +79,7 @@ namespace PolymeliaDeploy.Agent
 
         private void ActivityTaskSucceded(ActivityTaskDto activityTask)
         {
-            _deployControllerClient.UpdateActivityTaskStatus(activityTask.Id, ActivityStatus.Completed);
+            _deployControllerClient.ActivityCompleted(activityTask.Id);
 
             Report(CreateActiveReport(
                                       activityTask,
@@ -105,7 +98,7 @@ namespace PolymeliaDeploy.Agent
         {
             return new ActivityReport
             {
-                TaskId = activityTask.TaskId,
+                DeploymentId = activityTask.DeploymentId,
                 ServerRole = activityTask.ServerRole,
                 MachineName = System.Environment.MachineName,
                 Status = reportStatus,

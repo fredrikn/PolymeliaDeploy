@@ -10,11 +10,13 @@ namespace PolymeliaDeploy.DeployController
     {
         void Connect(string url, string serverRole);
 
-        Task UpdateActivityTaskStatus(long activityTaskId, ActivityStatus status);
+        Task ActivityCompleted(long activityTaskId);
 
+        Task ActivityFailed(long activityTaskId);
+        
         Task Report(ActivityReport report);
 
-        Task AgentIsReadyForNewTasks(long lastTaskId);
+        Task AgentIsReadyForNewTasks();
 
         Action<IEnumerable<ActivityTaskDto>> OnRunActivity { get; set; }
 

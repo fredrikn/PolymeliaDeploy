@@ -19,7 +19,7 @@ namespace PolymeliaDeploy.Controller
 
         public async Task<IEnumerable<ActivityReport>> GetReports(long taskId, long? fromLatestTaskId)
         {
-            //"reports/{TaskId}/{FromLastKnownId?}"
+            //"reports/{DeploymentId}/{FromLastKnownId?}"
 
             using (var client = new ControllerClientFactory().CreateWebHttpClient())
             {
@@ -45,7 +45,7 @@ namespace PolymeliaDeploy.Controller
         {
             var report = new ActivityReport
             {
-                TaskId = taskId,
+                DeploymentId = taskId,
                 LocalCreated = DateTime.Now,
                 MachineName = System.Environment.MachineName,
                 Message = message,

@@ -20,7 +20,7 @@
 
         public DbSet<ActivityTask> ActivityTasks { get; set; }
 
-        public DbSet<MainActivity> MainActivities { get; set; }
+        public DbSet<Deployment> Deployments { get; set; }
 
         public DbSet<ActivityReport> ActivityReports { get; set; }
 
@@ -31,5 +31,7 @@
         public DbSet<Variable> Variables { get; set; }
 
         public DbSet<DeployVariable> DeployVariables { get; set; }
+
+        public DbSet<Agent> Agents { get; set; }
     }
 }

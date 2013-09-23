@@ -4,7 +4,7 @@
     {
         public long Id { get; set; }
 
-        public long TaskId { get; set; }
+        public long DeploymentId { get; set; }
 
         public string VariableKey { get; set; }
 

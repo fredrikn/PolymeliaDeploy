@@ -18,7 +18,7 @@ namespace PolymeliaDeploy.Controller
         HttpClient _client = null;
 
 
-        public MainActivity LatestDeployedActivity(int projectId, int environmentId)
+        public Deployment LatestDeployedActivity(int projectId, int environmentId)
         {
              var client = GetDeployWebHttpClient();
 
@@ -29,7 +29,7 @@ namespace PolymeliaDeploy.Controller
                 var response = client.GetAsync(requestUrl).Result;
 
                 if (response.IsSuccessStatusCode)
-                    return response.Content.ReadAsAsync<MainActivity>().Result;
+                    return response.Content.ReadAsAsync<Deployment>().Result;
 
                 throw new HttpRequestException(
                     string.Format("{0} ({1})", (int)response.StatusCode, response.ReasonPhrase));
@@ -42,7 +42,7 @@ namespace PolymeliaDeploy.Controller
         }
 
 
-        public async Task<IEnumerable<MainActivity>> GetDeployHistory(int projectId, int environmentId)
+        public async Task<IEnumerable<Deployment>> GetDeployHistory(int projectId, int environmentId)
         {
             using (var client = new ControllerClientFactory().CreateWebHttpClient())
             {
@@ -51,7 +51,7 @@ namespace PolymeliaDeploy.Controller
                 var response = await client.GetAsync(requestUrl);
 
                 if (response.IsSuccessStatusCode)
-                    return await response.Content.ReadAsAsync<IEnumerable<MainActivity>>();
+                    return await response.Content.ReadAsAsync<IEnumerable<Deployment>>();
 
                 throw new HttpRequestException(
                     string.Format("{0} ({1})", (int)response.StatusCode, response.ReasonPhrase));
@@ -59,12 +59,12 @@ namespace PolymeliaDeploy.Controller
         }
 
 
-        public long Deploy(MainActivity mainActivity)
+        public long Deploy(Deployment deployment)
         {
             var client = GetDeployWebHttpClient();
 
             var response = client.PutAsync("/deploy/", 
-                new ObjectContent(typeof(MainActivity), mainActivity, new JsonMediaTypeFormatter())).Result;
+                new ObjectContent(typeof(Deployment), deployment, new JsonMediaTypeFormatter())).Result;
 
             if (response.IsSuccessStatusCode)
                 return response.Content.ReadAsAsync<long>().Result;

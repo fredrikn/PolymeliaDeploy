@@ -7,33 +7,39 @@ using PolymeliaDeploy.Data;
 
 namespace PolymeliaDeployController.Hub
 {
+    using System.Threading;
+
     using PolymeliaDeploy.Data.Repositories;
 
     public class DeployControllerHub : Microsoft.AspNet.SignalR.Hub
     {
-        private readonly IDictionary<string, string> _connectedAgents = new Dictionary<string, string>();
+        private readonly static IDictionary<string, Agent> _connectedAgents = new Dictionary<string, Agent>();
+        private static readonly object _lock = new object();
 
         private readonly IReportRepository _reportRepository;
         private readonly IActivityRepository _activityRepository;
+        private readonly IAgentRepository _agentRepository;
 
         public DeployControllerHub(
                                    IReportRepository reportRepository,
-                                   IActivityRepository activityRepository)
+                                   IActivityRepository activityRepository,
+                                   IAgentRepository agentRepository)
         {
             if (reportRepository == null) throw new ArgumentNullException("reportRepository");
             if (activityRepository == null) throw new ArgumentNullException("activityRepository");
+            if (agentRepository == null) throw new ArgumentNullException("agentRepository");
 
             _reportRepository = reportRepository;
             _activityRepository = activityRepository;
+            _agentRepository = agentRepository;
         }
-        
+
 
         //TODO: Add some sort of key/certificate, authentication
-        public void Connect(string roleName, string connectionId)
+        public void Connect(string roleName, string serverName)
         {
-            RegisterAgent(roleName, connectionId);
-
-            Console.WriteLine("Agent from IP: '{0}' with role: '{1}' is now connected", GetAgentIpAddress(), roleName);
+            RegisterAgent(roleName, GetAgentIpAddress(), serverName);
+            Console.WriteLine("Agent from server '{0}' and IP '{1}' with role: '{2}' is now connected", serverName, GetAgentIpAddress(), roleName);
         }
 
 
@@ -47,9 +53,11 @@ namespace PolymeliaDeployController.Hub
         }
 
 
-        public async Task AgentIsReadyForNewTasks(long lastTaskId, string roleName, string connectionId)
+        public async Task AgentIsReadyForNewTasks(string roleName)
         {
-            await CheckForAgentActivityAndRunActivities(roleName, lastTaskId, connectionId);
+            SetCurrentAgentToBeAvailable();
+
+            await CheckForAgentActivityAndRunActivities(roleName);
         }
 
 
@@ -59,21 +67,34 @@ namespace PolymeliaDeployController.Hub
         }
 
 
-        public async Task UpdateActivityTaskStatus(long activityTaskId, ActivityStatus status)
+        public async Task ActivityFailed(long activityTaskId)
         {
-            await _activityRepository.UpdateActivityTaskStatus(activityTaskId, status);
+            await _activityRepository.UpdateActivityTaskStatus(activityTaskId, ActivityStatus.Failed);
+        }
+
+
+        public async Task ActivityCompleted(long activityTaskId)
+        {
+            if (AreAllAgentsDoneWithActivity(activityTaskId))
+                await _activityRepository.UpdateActivityTaskStatus(activityTaskId, ActivityStatus.Completed);
         }
 
 
         public override Task OnDisconnected()
         {
-            var agentKey = _connectedAgents.Where(a => a.Value == Context.ConnectionId)
-                                           .Select( a => a.Key).FirstOrDefault();
+            lock (_lock)
+            {
+                if (_connectedAgents.ContainsKey(Context.ConnectionId))
+                {
+                    var agent = _connectedAgents[Context.ConnectionId];
 
-            if (agentKey != null)
-                _connectedAgents.Remove(agentKey);
+                    SetCurrentAgentToBeAvailable();
 
-            Console.WriteLine(string.Format("An Agent is now disconnected", GetAgentIpAddress()));
+                    _connectedAgents.Remove(Context.ConnectionId);
+
+                    Console.WriteLine("An Agent with the role '{0}' on Server '{1}' is now disconnected", agent.Role, agent.ServerName);
+                }
+            }
 
             return base.OnDisconnected();
         }
@@ -87,32 +108,61 @@ namespace PolymeliaDeployController.Hub
         }
 
 
-        private void RegisterAgent(string roleName, string connectionId)
+        private void RegisterAgent(string roleName, string agentIpAddress, string serverName)
         {
-            var agentId = string.Format("{0}_{1}", roleName, connectionId);
+            var agent = _agentRepository.Get(roleName, agentIpAddress);
 
-            if (!_connectedAgents.ContainsKey(agentId))
-                _connectedAgents.Add(agentId, Context.ConnectionId);
+            if (agent == null)
+            {
+                //TODO: Auto activate agent based on some creteria
+                agent = new Agent
+                {
+                    Confirmed = DateTime.Now,
+                    ConfirmedBy = Thread.CurrentPrincipal.Identity.Name,
+                    IsActive = true,
+                    Role = roleName,
+                    ServerName = serverName,
+                    IpAddress = agentIpAddress
+                };
+
+                _agentRepository.RegisterAgent(agent);
+            }
+
+            if (!agent.Confirmed.HasValue || !agent.IsActive)
+                Console.WriteLine("Agent from server '{0}' and with the role '{1}' is not confirmed or is inactive. The agent will not be used", serverName, roleName);
+
+            lock (_lock)
+            {
+                if (!_connectedAgents.ContainsKey(Context.ConnectionId))
+                    _connectedAgents.Add(Context.ConnectionId, agent);
+            }
         }
 
 
-        private async Task CheckForAgentActivityAndRunActivities(string roleName, long lastTaskId, string connectionId)
+        private async Task CheckForAgentActivityAndRunActivities(string roleName)
         {
-            var activityTasks = await GetActivityTasks(lastTaskId, roleName);
+            var activityTasks = await GetActivityTasks(roleName);
 
             var activityTaskDtos = activityTasks as IList<ActivityTaskDto> ?? activityTasks.ToList();
 
             if (activityTaskDtos.Any())
-                await Clients.Client(connectionId).RunActivities(activityTaskDtos);
+            {
+                SetCurrentAgentToBusy();
+
+                await Clients.Client(Context.ConnectionId).RunActivities(activityTaskDtos);
+            }
         }
 
-        private async Task<IEnumerable<ActivityTaskDto>> GetActivityTasks(long lastTaskId, string serverRole)
+
+        private async Task<IEnumerable<ActivityTaskDto>> GetActivityTasks(string serverRole)
         {
-            var activites = await _activityRepository.GetActivityTasks(lastTaskId, serverRole);
+            var agent = GetCurrentAgent();
+
+            var activites = await _activityRepository.GetActivityTasks(agent.LastActivityId == null ? 0 : agent.LastActivityId.Value, serverRole);
 
             var actititiesToRun = activites.ToList().Select(a => new ActivityTaskDto
             {
-                TaskId = a.TaskId,
+                DeploymentId = a.DeploymentId,
                 Id = a.Id,
                 ActivityCode = a.ActivityCode,
                 ActivityName = a.ActivityName,
@@ -129,6 +179,44 @@ namespace PolymeliaDeployController.Hub
                 return actititiesToRun;
 
             return new List<ActivityTaskDto>();
+        }
+
+
+        private Agent GetCurrentAgent()
+        {
+            Agent agent = null;
+
+            if (_connectedAgents.ContainsKey(Context.ConnectionId))
+                agent = _connectedAgents[Context.ConnectionId];
+
+            if (agent == null)
+                throw new ArgumentOutOfRangeException("_connectedAgents");
+
+            return agent;
+        }
+
+
+        private void SetCurrentAgentToBeAvailable()
+        {
+            var agent = GetCurrentAgent();
+            agent.IsBusy = false;
+
+            _agentRepository.Update(agent);
+        }
+
+
+        private void SetCurrentAgentToBusy()
+        {
+            var agent = GetCurrentAgent();
+            agent.IsBusy = true;
+
+            _agentRepository.Update(agent);
+        }
+
+
+        private static bool AreAllAgentsDoneWithActivity(long activityTaskId)
+        {
+            return _connectedAgents.Values.Any(a => !a.IsBusy && a.IsActive && a.LastActivityId == activityTaskId);
         }
 
 

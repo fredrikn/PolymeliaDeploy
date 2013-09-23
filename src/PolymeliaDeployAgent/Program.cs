@@ -28,15 +28,13 @@ namespace PolymeliaDeploy.Agent
         {
             var agentConfig = new AgentConfigurationSettings();
             var deployControllerClient = new DeployControllerClient();
-            var recordLastTaskId = new FileRecordLatestTask("lasttaskid.dat");
             var workflowRunner = new WorkflowRunner(new PolymeliaTrackingParticipantFactory().CreateTrackingParticipant(deployControllerClient));
             var taskExecutioner = new TaskActivityExecutioner(workflowRunner);
 
             return new AgentService(
                                     deployControllerClient,
                                     agentConfig,
-                                    taskExecutioner,
-                                    recordLastTaskId);
+                                    taskExecutioner);
         }
 
 

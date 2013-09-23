@@ -12,14 +12,14 @@
         public ReportModule()
         {
 
-            Get["reports/{TaskId}/{FromLastKnownId?}"] = param =>
+            Get["reports/{DeploymentId}/{FromLastKnownId?}"] = param =>
             {
-                long taskId = long.Parse(param.TaskId);
+                long taskId = long.Parse(param.DeploymentId);
                 long? fromLastKnownId = param.FromLastKnownId == null ? null : long.Parse(param.FromLastKnownId);
 
                 using (var db = new PolymeliaDeployDbContext())
                 {
-                    var query = db.ActivityReports.Where(a => a.TaskId == taskId);
+                    var query = db.ActivityReports.Where(a => a.DeploymentId == taskId);
 
                     if (fromLastKnownId.HasValue)
                         query = query.Where(a => a.Id > fromLastKnownId);

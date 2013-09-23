@@ -55,7 +55,7 @@
         {
             var activityReport = new ActivityReport
             {
-                TaskId = PolymeliaActivityContext.Current.TaskId,
+                DeploymentId = PolymeliaActivityContext.Current.DeploymentId,
                 MachineName = System.Environment.MachineName,
                 ServerRole = PolymeliaActivityContext.Current.ServerRole,
                 Environment = PolymeliaActivityContext.Current.Environment,
@@ -124,7 +124,7 @@
                 return;
 
             //reportRemoteClient.Report(
-            //                          PolymeliaActivityContext.Current.TaskId,
+            //                          PolymeliaActivityContext.Current.DeploymentId,
             //                          PolymeliaActivityContext.Current.ServerRole,
             //                          msg,
             //                          DisplayName,

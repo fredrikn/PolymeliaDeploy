@@ -24,7 +24,7 @@
                     int environmentId = int.Parse(param.EnvironmentId);
                     int projectId = int.Parse(param.ProjectId);
 
-                    var maintask = db.MainActivities.Where(m => m.ProjectId == projectId &&
+                    var maintask = db.Deployments.Where(m => m.ProjectId == projectId &&
                                                                 m.EnvironmentId == environmentId)
                                                     .OrderByDescending(m => m.Id)
                                                     .FirstOrDefault();
@@ -41,7 +41,7 @@
                     int environmentId = int.Parse(param.EnvironmentId);
                     int projectId = int.Parse(param.ProjectId);
 
-                    var maintasks = db.MainActivities.Where(m => m.ProjectId == projectId  &&
+                    var maintasks = db.Deployments.Where(m => m.ProjectId == projectId  &&
                                                                  m.EnvironmentId == environmentId)
                                                     .OrderByDescending(m => m.Id)
                                                     .Take(5).ToList();
@@ -66,7 +66,7 @@
 
                     if (status == ActivityStatus.Failed)
                     {
-                        var mainActivity = db.MainActivities.SingleOrDefault(t => t.Id == activityTask.TaskId);
+                        var mainActivity = db.Deployments.SingleOrDefault(t => t.Id == activityTask.DeploymentId);
                         mainActivity.Status = ActivityStatus.Failed;
                     }
 
@@ -79,7 +79,7 @@
 
             Put["deploy/"] = _ =>
             {
-                var mainActivity = this.Bind<MainActivity>();
+                var mainActivity = this.Bind<Deployment>();
 
                 DeployServices.ReportClient = new ReportLocalClient();
 
@@ -87,7 +87,7 @@
                 
                 using (var db = new PolymeliaDeployDbContext())
                 {
-                    db.MainActivities.Add(mainActivity);
+                    db.Deployments.Add(mainActivity);
                     db.SaveChanges();
                 
                     foreach (var variable in db.Variables.Where( v => v.EnvironmentId == mainActivity.EnvironmentId))
@@ -104,7 +104,7 @@
 
                 var parameters = new Dictionary<string, object>
                                  {
-                                     { "DeployTaskId", mainActivity.Id },
+                                     { "DeploymentId", mainActivity.Id },
                                      { "DeployTaskVersion", mainActivity.Version },
                                      { "DeployVariables", deployVariables },
                                      { "DeployEnvironment", mainActivity.Environment }
@@ -117,18 +117,18 @@
             };
         }
 
-        private static DeployVariable CreateDeployVariable(MainActivity mainActivity, Variable variable)
+        private static DeployVariable CreateDeployVariable(Deployment deployment, Variable variable)
         {
             return new DeployVariable
                    {
-                       TaskId = mainActivity.Id,
+                       DeploymentId = deployment.Id,
                        VariableKey = variable.VariableKey,
                        VariableValue = variable.VariableValue,
                        Scope = variable.Scope
                    };
         }
 
-        private static IDictionary<string, string> GetEnvironmentVariables(PolymeliaDeployDbContext db, MainActivity maintask)
+        private static IDictionary<string, string> GetEnvironmentVariables(PolymeliaDeployDbContext db, Deployment maintask)
         {
             var variables = db.Variables.Where(v => v.EnvironmentId == maintask.EnvironmentId);
 

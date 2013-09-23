@@ -21,7 +21,7 @@ namespace PolymeliaDeploy.Controller
                         {
                             var report = new ActivityReport
                             {
-                                TaskId = taskId,
+                                DeploymentId = taskId,
                                 LocalCreated = DateTime.Now,
                                 MachineName = System.Environment.MachineName,
                                 Message = message,

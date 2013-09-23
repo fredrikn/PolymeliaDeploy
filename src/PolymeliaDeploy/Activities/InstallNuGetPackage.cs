@@ -146,7 +146,7 @@
                                     { "PolymeliaVersion", activityContext.DeployVersion },
                                     { "PolymeliaEnvironment", activityContext.Environment },
                                     { "PolymeliaMachineName", System.Environment.MachineName },
-                                    { "PolymeliaTaskId", activityContext.TaskId },
+                                    { "PolymeliaTaskId", activityContext.DeploymentId },
                                     { "PolymeliaDestinationPath", _destinationFolder },
                                     { "PolymeliaPackageName", context.GetValue(PackageName) },
                                     { "PolymeliaPackageVersion", _packageVersion }
@@ -380,7 +380,7 @@
         {
             var msg = string.Format(message, arguments);
 
-            await reportRemoteClient.Report(PolymeliaActivityContext.Current.TaskId, PolymeliaActivityContext.Current.ServerRole, msg, DisplayName);
+            await reportRemoteClient.Report(PolymeliaActivityContext.Current.DeploymentId, PolymeliaActivityContext.Current.ServerRole, msg, DisplayName);
 
             Console.WriteLine(msg);
         }
@@ -390,7 +390,7 @@
         {
             var msg = string.Format(message, arguments);
 
-            await reportRemoteClient.Report(PolymeliaActivityContext.Current.TaskId, PolymeliaActivityContext.Current.ServerRole, msg, DisplayName, ReportStatus.Error);
+            await reportRemoteClient.Report(PolymeliaActivityContext.Current.DeploymentId, PolymeliaActivityContext.Current.ServerRole, msg, DisplayName, ReportStatus.Error);
 
             Console.WriteLine(msg);
         }

@@ -11,12 +11,12 @@
     {
         IEnumerable<ActivityTaskDto> GetActivityTasksFromDeployController(long latestTaskRunId, string serverRoleName);
 
-        Task<IEnumerable<MainActivity>> GetDeployHistory(int projectId, int environmentId);
+        Task<IEnumerable<Deployment>> GetDeployHistory(int projectId, int environmentId);
 
-        MainActivity LatestDeployedActivity(int projectId, int environmentId);
+        Deployment LatestDeployedActivity(int projectId, int environmentId);
 
         void UpdateActivityTaskStatus(ActivityTaskDto activityTask);
 
-        long Deploy(MainActivity mainActivity);
+        long Deploy(Deployment deployment);
     }
 }

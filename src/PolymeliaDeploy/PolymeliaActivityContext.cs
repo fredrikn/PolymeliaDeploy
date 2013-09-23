@@ -32,7 +32,7 @@
         public Collection<DeployVariable> Variables { get; set; }
         public string ServerRole { get; set; }
         public long? CurrentActivityId { get; set; }
-        public long TaskId { get; set; }
+        public long DeploymentId { get; set; }
         public string DeployVersion { get; set; }
 
         public string Environment { get; set; }

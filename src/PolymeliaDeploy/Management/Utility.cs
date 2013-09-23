@@ -261,7 +261,7 @@
 
 
         //
-        // Get RASD definitions
+        // GetActiveAgent RASD definitions
         //
         public static ManagementObject GetResourceAllocationsettingDataDefault
         (
@@ -291,7 +291,7 @@
 
             var poolResources = searcher.Get();
 
-            //Get pool resource allocation ability
+            //GetActiveAgent pool resource allocation ability
             if (poolResources.Count == 1)
             {
                 foreach (ManagementObject poolResource in poolResources)

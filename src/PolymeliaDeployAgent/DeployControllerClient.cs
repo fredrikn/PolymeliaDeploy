@@ -55,16 +55,20 @@ namespace PolymeliaDeploy.Agent
         }
 
 
-        public async Task UpdateActivityTaskStatus(long activityTaskId, ActivityStatus status)
+        public async Task ActivityCompleted(long activityTaskId)
         {
-            //TODO: Make sure ConnectionId is sent, so Controller can know when all agents are done.
-            await _hubProxy.Invoke("UpdateActivityTaskStatus", activityTaskId, status);
+            await _hubProxy.Invoke("ActivityCompleted", activityTaskId);
+        }
+
+        public async Task ActivityFailed(long activityTaskId)
+        {
+            await _hubProxy.Invoke("ActivityFailed", activityTaskId);
         }
 
 
-        public async Task AgentIsReadyForNewTasks(long lastTaskId)
+        public async Task AgentIsReadyForNewTasks()
         {
-            await _hubProxy.Invoke("AgentIsReadyForNewTasks", lastTaskId, _serverRole, _hubConnection.ConnectionId);
+            await _hubProxy.Invoke("AgentIsReadyForNewTasks", _serverRole);
         }
 
 
@@ -153,7 +157,7 @@ namespace PolymeliaDeploy.Agent
             if (change.NewState == ConnectionState.Connected)
             {
                 Thread.Sleep(2000);
-                await _hubProxy.Invoke("Connect", serverRole, _hubConnection.ConnectionId);
+                await _hubProxy.Invoke("Connect", serverRole, System.Environment.MachineName);
 
                 Console.WriteLine("Connection to controller '{0}'", url);
 

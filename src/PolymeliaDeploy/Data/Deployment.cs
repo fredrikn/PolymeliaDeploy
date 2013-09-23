@@ -3,7 +3,7 @@
     using System;
     using System.ComponentModel.DataAnnotations.Schema;
 
-    public class MainActivity
+    public class Deployment
     {
         public long Id { get; set; }
 

@@ -18,22 +18,16 @@ namespace PolymeliaDeploy.Agent.Activity
         }
 
 
-        public long? ExecuteTasks(
+        public void ExecuteTasks(
                                  IEnumerable<ActivityTaskDto> tasks,
                                  Action<ActivityTaskDto> activitySucceededAction = null,
                                  Action<ActivityTaskDto, string> activityFailedAction = null)
         {
-            long? lastExecutedTaskId = null;
-
             foreach (var task in tasks)
             {
-                lastExecutedTaskId = task.TaskId;
-
                 if (!ExecuteTask(task, activitySucceededAction, activityFailedAction))
                     break;
             }
-
-            return lastExecutedTaskId;
         }
 
 

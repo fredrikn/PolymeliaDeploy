@@ -19,7 +19,7 @@ namespace PolymeliaDeploy.Data.Repositories
 
                     if (status == ActivityStatus.Failed)
                     {
-                        var mainActivity = db.MainActivities.Single(t => t.Id == activityTask.TaskId);
+                        var mainActivity = db.Deployments.Single(t => t.Id == activityTask.DeploymentId);
                         mainActivity.Status = ActivityStatus.Failed;
                     }
 
@@ -35,8 +35,8 @@ namespace PolymeliaDeploy.Data.Repositories
             {
                 using (var db = new PolymeliaDeployDbContext())
                 {
-                    var maintask = db.MainActivities.Where(t => t.Id > lastTaskId &&
-                                                          (t.Status != ActivityStatus.Failed ||
+                    var maintask = db.Deployments.Where(t => t.Id > lastTaskId &&
+                                                          (t.Status != ActivityStatus.Failed &&
                                                            t.Status != ActivityStatus.Canceled))
                                                     .OrderByDescending(t => t.Id)
                                                     .FirstOrDefault();
@@ -44,7 +44,7 @@ namespace PolymeliaDeploy.Data.Repositories
                     if (maintask != null)
                     {
                         return db.ActivityTasks.Where(t => t.ServerRole == serverRole &&
-                                                           t.TaskId == maintask.Id)
+                                                           t.DeploymentId == maintask.Id)
                                                .OrderBy(t => t.Id)
                                                .ToList();
                     }

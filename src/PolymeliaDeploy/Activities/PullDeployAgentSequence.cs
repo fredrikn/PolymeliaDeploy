@@ -48,7 +48,7 @@ namespace PolymeliaDeploy.Activities
         {
             var task = new ActivityTask
                            {
-                                TaskId = PolymeliaActivityContext.Current.TaskId,
+                                DeploymentId = PolymeliaActivityContext.Current.DeploymentId,
                                 Environment = PolymeliaActivityContext.Current.Environment,
                                 ServerRole = ServerRole.Get(context),
                                 ActivityCode = activity,
@@ -70,7 +70,7 @@ namespace PolymeliaDeploy.Activities
         {
             var sequence = new StartAgentActivity
                             {
-                                DeployTaskId = PolymeliaActivityContext.Current.TaskId,
+                                DeploymentId = PolymeliaActivityContext.Current.DeploymentId,
                                 DeployTaskVersion = PolymeliaActivityContext.Current.DeployVersion,
                                 DeployVariables = PolymeliaActivityContext.Current.Variables,
                                 ServerRole = ServerRole.Get(context),

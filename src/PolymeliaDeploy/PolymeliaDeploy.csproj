@@ -101,9 +101,14 @@
     <Compile Include="Activities\PolymeliaNativiveActivity.cs" />
     <Compile Include="Activities\PullDeployAgentSequence.cs" />
     <Compile Include="Agent\AgentStatus.cs" />
+    <Compile Include="Data\Agent.cs" />
     <Compile Include="Data\DeployVariable.cs" />
     <Compile Include="Data\Repositories\ActivityRepository.cs" />
+    <Compile Include="Data\Repositories\AgentRepository.cs" />
+    <Compile Include="Data\Repositories\DeploymentRepository.cs" />
     <Compile Include="Data\Repositories\IActivityRepository.cs" />
+    <Compile Include="Data\Repositories\IAgentRepository.cs" />
+    <Compile Include="Data\Repositories\IDeploymentRepository.cs" />
     <Compile Include="Data\Repositories\IReportRepository.cs" />
     <Compile Include="Data\Repositories\ReportRepository.cs" />
     <Compile Include="DeployController\IDeployConrollerReportClient.cs" />
@@ -130,7 +135,7 @@
     <Compile Include="Data\ActivityReport.cs" />
     <Compile Include="Data\ActivityTask.cs" />
     <Compile Include="Data\Environment.cs" />
-    <Compile Include="Data\MainActivity.cs" />
+    <Compile Include="Data\Deployment.cs" />
     <Compile Include="Data\PolymeliaDeployDbContext.cs" />
     <Compile Include="Data\Project.cs" />
     <Compile Include="Data\Variable.cs" />

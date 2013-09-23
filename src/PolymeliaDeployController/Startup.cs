@@ -18,7 +18,8 @@
                                                    typeof(DeployControllerHub),
                                                    () => new DeployControllerHub(
                                                                                new ReportRepository(),
-                                                                               new ActivityRepository()));
+                                                                               new ActivityRepository(),
+                                                                               new AgentRepository()));
 
             app.MapHubs(config);
 

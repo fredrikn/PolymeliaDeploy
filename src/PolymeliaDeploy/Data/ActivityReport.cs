@@ -21,7 +21,7 @@ namespace PolymeliaDeploy.Data
 
         public long Id { get; set; }
 
-        public long TaskId { get; set; }
+        public long DeploymentId { get; set; }
 
         public long? ActivityTaskId { get; set; }
 

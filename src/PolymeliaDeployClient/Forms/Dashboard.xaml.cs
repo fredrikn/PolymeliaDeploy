@@ -93,13 +93,13 @@ namespace PolymeliaDeployClient.Forms
             }
         }
 
-        private static Color ConvertStatusToColor(MainActivity mainActivity)
+        private static Color ConvertStatusToColor(Deployment deployment)
         {
             Color color;
 
-            if (mainActivity.Status == ActivityStatus.Completed)
+            if (deployment.Status == ActivityStatus.Completed)
                 color = Color.FromRgb(200, 255, 200);
-            else if (mainActivity.Status == ActivityStatus.Failed)
+            else if (deployment.Status == ActivityStatus.Failed)
                 color = Color.FromRgb(255, 180, 180);
             else
                 color = Color.FromRgb(200, 200, 200);
@@ -108,7 +108,7 @@ namespace PolymeliaDeployClient.Forms
         }
 
         private static UIElement CreateDeployVersionBox(
-                                                        MainActivity mainActivity,
+                                                        Deployment deployment,
                                                         Color color,
                                                         int gridColumn = 0,
                                                         int gridRow = 0)
@@ -126,7 +126,7 @@ namespace PolymeliaDeployClient.Forms
             box.Children.Add(new TextBlock
                              {
                                  FontSize = 14,
-                                 Text = "VERSION: " + mainActivity.Version,
+                                 Text = "VERSION: " + deployment.Version,
                                  HorizontalAlignment = HorizontalAlignment.Left,
                                  Margin = new Thickness(8, 8, 8, 4)
                              });
@@ -134,7 +134,7 @@ namespace PolymeliaDeployClient.Forms
             box.Children.Add(new TextBlock
                             {
                                 FontSize = 14,
-                                Text = mainActivity.Created.ToString("ddd MMM M yyyy hh:mm tt"),
+                                Text = deployment.Created.ToString("ddd MMM M yyyy hh:mm tt"),
                                 HorizontalAlignment = HorizontalAlignment.Left,
                                 Margin = new Thickness(8, 4, 8, 4)
                             });
@@ -142,7 +142,7 @@ namespace PolymeliaDeployClient.Forms
             box.Children.Add(new TextBlock
                             {
                                 FontSize = 12,
-                                Text = "DEPLOYED BY: " + mainActivity.CreatedBy,
+                                Text = "DEPLOYED BY: " + deployment.CreatedBy,
                                 HorizontalAlignment = HorizontalAlignment.Left,
                                 Margin = new Thickness(8, 4 ,8, 8)
                             });

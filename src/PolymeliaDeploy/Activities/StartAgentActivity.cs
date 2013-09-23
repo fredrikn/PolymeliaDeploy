@@ -20,7 +20,7 @@
         private Collection<DeployVariable> _deployVariables = new Collection<DeployVariable>();
 
         [Browsable(false)]
-        public InArgument<long> DeployTaskId { get; set; }
+        public InArgument<long> DeploymentId { get; set; }
 
         [Browsable(false)]
         public InArgument<string> DeployTaskVersion { get; set; }
@@ -66,7 +66,7 @@
 
         protected override void Execute(NativeActivityContext context)
         {
-            PolymeliaActivityContext.Current.TaskId = DeployTaskId.Get(context);
+            PolymeliaActivityContext.Current.DeploymentId = DeploymentId.Get(context);
             PolymeliaActivityContext.Current.DeployVersion = DeployTaskVersion.Get(context);
             PolymeliaActivityContext.Current.Variables = DeployVariables;
             PolymeliaActivityContext.Current.ServerRole = ServerRole.Get(context);

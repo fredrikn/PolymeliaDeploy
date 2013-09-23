@@ -82,7 +82,7 @@ namespace PolymeliaDeployClient.Forms
         {
             var deploymentControllerClient = new ActivityRemoteClient();
 
-            var taskId = deploymentControllerClient.Deploy(new MainActivity
+            var taskId = deploymentControllerClient.Deploy(new Deployment
             {
                 CreatedBy = Thread.CurrentPrincipal.Identity.Name,
                 DeployActivity = SelectedEnvironment.WorkflowContent,
