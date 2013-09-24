@@ -13,6 +13,8 @@ namespace PolymeliaDeploy.Agent
     using System.Linq;
     using System.Threading;
 
+    using PolymeliaDeploy.Security;
+
     public class DeployControllerClient : IDeployControllerClient, IDeployConrollerReportClient
     {
         private bool _isRunning;
@@ -27,13 +29,13 @@ namespace PolymeliaDeploy.Agent
 
         private string _serverRole;
 
-
         public Action<IEnumerable<ActivityTaskDto>> OnRunActivity { get; set; }
 
 
         public Action OnConnected { get; set; }
 
-        public void Connect(string url, string serverRole)
+
+        public void Connect(string url, string serverRole, string controllerKey)
         {
             if (string.IsNullOrWhiteSpace(url)) throw new ArgumentNullException("url");
             if (string.IsNullOrWhiteSpace(serverRole)) throw new ArgumentNullException("serverRole");
@@ -44,7 +46,7 @@ namespace PolymeliaDeploy.Agent
 
             _isRunning = true;
 
-            ConnectToDeployControllerHub(url, serverRole);
+            ConnectToDeployControllerHub(url, serverRole, controllerKey);
         }
 
 
@@ -55,20 +57,21 @@ namespace PolymeliaDeploy.Agent
         }
 
 
+        public async Task AgentIsReadyForNewTasks()
+        {
+            await _hubProxy.Invoke("AgentIsReadyForNewTasks", _serverRole);
+        }
+
+
         public async Task ActivityCompleted(long activityTaskId)
         {
             await _hubProxy.Invoke("ActivityCompleted", activityTaskId);
         }
 
+
         public async Task ActivityFailed(long activityTaskId)
         {
             await _hubProxy.Invoke("ActivityFailed", activityTaskId);
-        }
-
-
-        public async Task AgentIsReadyForNewTasks()
-        {
-            await _hubProxy.Invoke("AgentIsReadyForNewTasks", _serverRole);
         }
 
 
@@ -91,7 +94,6 @@ namespace PolymeliaDeploy.Agent
         public void Disconnect()
         {
             if (_hubConnection != null && _hubConnection.State != ConnectionState.Disconnected) _hubConnection.Stop();
-
             _isRunning = false;
         }
 
@@ -107,12 +109,16 @@ namespace PolymeliaDeploy.Agent
         }
 
 
-        private void ConnectToDeployControllerHub(string url, string serverRole)
+        private void ConnectToDeployControllerHub(string url, string serverRole, string controllerKey)
         {
             _hubConnection = new HubConnection(url);
             _hubProxy = _hubConnection.CreateHubProxy("DeployControllerHub");
 
-            _hubConnection.StateChanged += async change => await HandleConnectionStates(url, serverRole, change);
+            _hubConnection.StateChanged += change => HandleConnectionStates(url, change);
+
+            _hubConnection.Headers.Add("AgentRoleName", serverRole);
+            _hubConnection.Headers.Add("AgentServerName", System.Environment.MachineName);
+            _hubConnection.Headers.Add("ControllerKey", TokenGenerator.Generate(controllerKey));
 
             _hubProxy.On<IEnumerable<ActivityTaskDto>>("RunActivities", RunActivities);
 
@@ -150,21 +156,15 @@ namespace PolymeliaDeploy.Agent
         }
 
 
-        private async Task HandleConnectionStates(string url, string serverRole, StateChange change)
+        private void HandleConnectionStates(string url, StateChange change)
         {
             Console.WriteLine("Connection state to controller '{0}' is changed '{1}'", url, change.NewState);
 
             if (change.NewState == ConnectionState.Connected)
             {
-                Thread.Sleep(2000);
-                await _hubProxy.Invoke("Connect", serverRole, System.Environment.MachineName);
-
                 Console.WriteLine("Connection to controller '{0}'", url);
 
                 ReportTemporaryReportsIfAvailable(_tempActivityReport);
-
-                if (OnConnected != null)
-                    OnConnected();
             }
 
             //Retry to connect to the Controller each 5 seconds if SignalR reconnecting is timed out.

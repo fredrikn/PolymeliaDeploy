@@ -113,6 +113,7 @@
     <Compile Include="Data\Repositories\ReportRepository.cs" />
     <Compile Include="DeployController\IDeployConrollerReportClient.cs" />
     <Compile Include="DeployController\IDeployControllerClient.cs" />
+    <Compile Include="Security\TokenGenerator.cs" />
     <Compile Include="Workflow\IWorkflowRunner.cs" />
     <Compile Include="Workflow\PolymeliaTrackingParticipant.cs" />
     <Compile Include="Workflow\IgnorableXamlXmlWriter.cs" />

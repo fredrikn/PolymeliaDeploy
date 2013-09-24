@@ -5,6 +5,7 @@
 
     using PolymeliaDeploy.Data.Repositories;
 
+    using PolymeliaDeployController.Configuration;
     using PolymeliaDeployController.Hub;
 
     public partial class Startup
@@ -19,7 +20,8 @@
                                                    () => new DeployControllerHub(
                                                                                new ReportRepository(),
                                                                                new ActivityRepository(),
-                                                                               new AgentRepository()));
+                                                                               new AgentRepository(),
+                                                                               new ControllerConfigurationSettings()));
 
             app.MapHubs(config);
 

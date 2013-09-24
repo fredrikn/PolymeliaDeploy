@@ -1,30 +1,18 @@
-﻿using PolymeliaDeploy.Network;
-
-using System.Configuration;
-
-namespace PolymeliaDeploy.Agent.Configuration
+﻿namespace PolymeliaDeployController.Configuration
 {
-    public class AgentConfigurationSettings : IAgentConfigurationSettings
+    using System.Configuration;
+
+    public class ControllerConfigurationSettings : IControllerConfigurationSettings
     {
-        public string DeployControllerUrl
+  
+        public string ControllerHostUrl
         {
             get
             {
-                return GetAppSettings(
-                                      "PolymeliaDeployBaseWebUri",
-                                      string.Format("http://{0}:12345", IPAddressRetriever.LocalIPAddress()));
-            }
-        }
-
-
-        public string ServerRole
-        {
-            get
-            {
-                var serverRole = GetAppSettings("ServerRoleName");
+                var serverRole = GetAppSettings("ControllerHostUrl");
 
                 if (string.IsNullOrWhiteSpace(serverRole))
-                    throw new ConfigurationErrorsException("The ServerRoleName can't be empty, make sure the ServerRoleName is added to the application configuration file appSettings.");
+                    throw new ConfigurationErrorsException("The ControllerHostUrl can't be empty, make sure the ControllerHostUrl is added to the application configuration file appSettings.");
 
                 return serverRole;
             }

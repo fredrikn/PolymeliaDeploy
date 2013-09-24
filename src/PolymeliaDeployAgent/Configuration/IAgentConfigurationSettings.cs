@@ -5,5 +5,7 @@ namespace PolymeliaDeploy.Agent.Configuration
     {
         string ServerRole { get; }
         string DeployControllerUrl { get; }
+
+        string ControllerKey { get; }
     }
 }

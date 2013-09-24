@@ -8,19 +8,17 @@ namespace PolymeliaDeploy.DeployController
 {
     public interface IDeployControllerClient : IDisposable
     {
-        void Connect(string url, string serverRole);
+        void Connect(string url, string serverRole, string controllerKey);
 
         Task ActivityCompleted(long activityTaskId);
 
         Task ActivityFailed(long activityTaskId);
-        
-        Task Report(ActivityReport report);
 
         Task AgentIsReadyForNewTasks();
 
-        Action<IEnumerable<ActivityTaskDto>> OnRunActivity { get; set; }
+        Task Report(ActivityReport report);
 
-        Action OnConnected { get; set; }
+        Action<IEnumerable<ActivityTaskDto>> OnRunActivity { get; set; }
 
         void Disconnect();
     }

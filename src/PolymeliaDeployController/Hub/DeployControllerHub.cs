@@ -7,9 +7,15 @@ using PolymeliaDeploy.Data;
 
 namespace PolymeliaDeployController.Hub
 {
+    using System.Security;
     using System.Threading;
 
+    using Microsoft.AspNet.SignalR.Hubs;
+
     using PolymeliaDeploy.Data.Repositories;
+    using PolymeliaDeploy.Security;
+
+    using PolymeliaDeployController.Configuration;
 
     public class DeployControllerHub : Microsoft.AspNet.SignalR.Hub
     {
@@ -19,27 +25,47 @@ namespace PolymeliaDeployController.Hub
         private readonly IReportRepository _reportRepository;
         private readonly IActivityRepository _activityRepository;
         private readonly IAgentRepository _agentRepository;
+        private readonly IControllerConfigurationSettings _controllerSettings;
 
         public DeployControllerHub(
                                    IReportRepository reportRepository,
                                    IActivityRepository activityRepository,
-                                   IAgentRepository agentRepository)
+                                   IAgentRepository agentRepository,
+                                   IControllerConfigurationSettings controllerSettings)
         {
             if (reportRepository == null) throw new ArgumentNullException("reportRepository");
             if (activityRepository == null) throw new ArgumentNullException("activityRepository");
             if (agentRepository == null) throw new ArgumentNullException("agentRepository");
+            if (controllerSettings == null) throw new ArgumentNullException("controllerSettings");
 
             _reportRepository = reportRepository;
             _activityRepository = activityRepository;
             _agentRepository = agentRepository;
+            _controllerSettings = controllerSettings;
         }
 
 
-        //TODO: Add some sort of key/certificate, authentication
-        public void Connect(string roleName, string serverName)
+        public override Task OnConnected()
         {
+            var roleName = Context.Headers["AgentRoleName"];
+            var serverName = Context.Headers["AgentServerName"];
+            var controllerKey = Context.Headers["ControllerKey"];
+
+            if (string.IsNullOrWhiteSpace(controllerKey))
+                throw new UnauthorizedAccessException("Access denied!");
+
+            if (!controllerKey.Equals(TokenGenerator.Generate(_controllerSettings.ControllerKey)))
+                throw new UnauthorizedAccessException("Access denied!");
+
             RegisterAgent(roleName, GetAgentIpAddress(), serverName);
             Console.WriteLine("Agent from server '{0}' and IP '{1}' with role: '{2}' is now connected", serverName, GetAgentIpAddress(), roleName);
+
+            return base.OnConnected().ContinueWith(
+                t =>
+                {
+                    SetCurrentAgentToBeAvailable();
+                    Task.Run( async () => await CheckForAgentActivityAndRunActivities(roleName));
+                });
         }
 
 
@@ -53,30 +79,38 @@ namespace PolymeliaDeployController.Hub
         }
 
 
-        public async Task AgentIsReadyForNewTasks(string roleName)
-        {
-            SetCurrentAgentToBeAvailable();
-
-            await CheckForAgentActivityAndRunActivities(roleName);
-        }
-
-
         public async Task Report(ActivityReport report)
         {
+            EnsureAgentIsAuthorized();
+
             await _reportRepository.AddReport(report);
         }
 
 
         public async Task ActivityFailed(long activityTaskId)
         {
+            EnsureAgentIsAuthorized();
+
             await _activityRepository.UpdateActivityTaskStatus(activityTaskId, ActivityStatus.Failed);
         }
 
 
         public async Task ActivityCompleted(long activityTaskId)
         {
+            EnsureAgentIsAuthorized();
+
             if (AreAllAgentsDoneWithActivity(activityTaskId))
                 await _activityRepository.UpdateActivityTaskStatus(activityTaskId, ActivityStatus.Completed);
+        }
+
+
+        public async Task AgentIsReadyForNewTasks(string roleName)
+        {
+            EnsureAgentIsAuthorized();
+
+            SetCurrentAgentToBeAvailable();
+
+            await CheckForAgentActivityAndRunActivities(roleName);
         }
 
 
@@ -113,23 +147,13 @@ namespace PolymeliaDeployController.Hub
             var agent = _agentRepository.Get(roleName, serverName);
 
             if (agent == null)
-            {
-                //TODO: Auto activate agent based on some creteria
-                agent = new Agent
-                {
-                    Confirmed = DateTime.Now,
-                    ConfirmedBy = Thread.CurrentPrincipal.Identity.Name,
-                    IsActive = true,
-                    Role = roleName,
-                    ServerName = serverName,
-                    IpAddress = agentIpAddress
-                };
-
-                _agentRepository.RegisterAgent(agent);
-            }
+                agent = RegisterNewAgent(roleName, agentIpAddress, serverName);
 
             if (!agent.Confirmed.HasValue || !agent.IsActive)
+            {
                 Console.WriteLine("Agent from server '{0}' and with the role '{1}' is not confirmed or is inactive. The agent will not be used", serverName, roleName);
+                throw new SecurityException("Access denied!");
+            }
 
             lock (_lock)
             {
@@ -138,6 +162,36 @@ namespace PolymeliaDeployController.Hub
             }
         }
 
+
+        private void EnsureAgentIsAuthorized()
+        {
+            var agent = GetCurrentAgent();
+
+            if (agent.IsActive && agent.Confirmed != null)
+                return;
+
+            throw new NotAuthorizedException("Agent isn't authorized");
+
+        }
+
+
+        private Agent RegisterNewAgent(string roleName, string agentIpAddress, string serverName)
+        {
+            //TODO: Auto activate agent based on some creteria?!
+            var agent = new Agent
+                    {
+                        Confirmed = null,
+                        ConfirmedBy = Thread.CurrentPrincipal.Identity.Name,
+                        IsActive = false,
+                        Role = roleName,
+                        ServerName = serverName,
+                        IpAddress = agentIpAddress
+                    };
+
+            _agentRepository.RegisterAgent(agent);
+
+            return agent;
+        }
 
         private async Task CheckForAgentActivityAndRunActivities(string roleName)
         {
@@ -151,10 +205,7 @@ namespace PolymeliaDeployController.Hub
 
                 await Clients.Client(Context.ConnectionId).RunActivities(activityTaskDtos);
 
-                var agent = GetCurrentAgent();
-                agent.LastDeploymentId = activityTaskDtos.First().DeploymentId;
-
-                _agentRepository.Update(agent);
+                UpdateAgentsLastDeployment(activityTaskDtos);
             }
         }
 
@@ -187,6 +238,15 @@ namespace PolymeliaDeployController.Hub
         }
 
 
+        private void UpdateAgentsLastDeployment(IEnumerable<ActivityTaskDto> activityTaskDtos)
+        {
+            var agent = GetCurrentAgent();
+            agent.LastDeploymentId = activityTaskDtos.First().DeploymentId;
+
+            _agentRepository.Update(agent);
+        }
+
+
         private Agent GetCurrentAgent()
         {
             Agent agent = null;
@@ -195,7 +255,7 @@ namespace PolymeliaDeployController.Hub
                 agent = _connectedAgents[Context.ConnectionId];
 
             if (agent == null)
-                throw new ArgumentOutOfRangeException("_connectedAgents");
+                throw new NotAuthorizedException("Agent isn't authorized");
 
             return agent;
         }
@@ -205,8 +265,6 @@ namespace PolymeliaDeployController.Hub
         {
             var agent = GetCurrentAgent();
             agent.IsBusy = false;
-
-            _agentRepository.Update(agent);
         }
 
 
@@ -214,8 +272,6 @@ namespace PolymeliaDeployController.Hub
         {
             var agent = GetCurrentAgent();
             agent.IsBusy = true;
-
-            _agentRepository.Update(agent);
         }
 
 

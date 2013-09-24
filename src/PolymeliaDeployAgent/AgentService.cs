@@ -36,22 +36,12 @@ namespace PolymeliaDeploy.Agent
 
         public void Start()
         {
-            _deployControllerClient.OnConnected = OnConnectedToController();
             _deployControllerClient.OnRunActivity = RunActivities;
 
             _deployControllerClient.Connect(
                                             _agentConfig.DeployControllerUrl,
-                                            _agentConfig.ServerRole);
-        }
-
-
-        private Action OnConnectedToController()
-        {
-            return () =>
-            {
-                if (_agentStatus == AgentStatus.Ready)
-                    _deployControllerClient.AgentIsReadyForNewTasks();
-            };
+                                            _agentConfig.ServerRole,
+                                            _agentConfig.ControllerKey);
         }
 
 

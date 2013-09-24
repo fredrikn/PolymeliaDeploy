@@ -40,9 +40,9 @@ namespace PolymeliaDeploy.Activities
 
         private void CreateQueue(NativeActivityContext context)
         {
-            var queue = MessageQueue.Create(context.GetValue(this.QueueName), context.GetValue(this.TransactionalQueue));
+            var queue = MessageQueue.Create(context.GetValue(QueueName), context.GetValue(TransactionalQueue));
 
-            var tr = new Trustee(GetNameBySid(context.GetValue(this.UserSID)));
+            var tr = new Trustee(GetNameBySid(context.GetValue(UserSID)));
 
             queue.SetPermissions(
                 new AccessControlList

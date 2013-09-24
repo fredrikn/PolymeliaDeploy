@@ -1,5 +1,6 @@
 ﻿namespace PolymeliaDeploy.Data.Repositories
 {
+    using System.Data;
     using System.Linq;
 
     public class AgentRepository : IAgentRepository
@@ -29,6 +30,7 @@
             using (var db = new PolymeliaDeployDbContext())
             {
                 db.Agents.Attach(agent);
+                db.Entry(agent).State = EntityState.Modified;
                 db.SaveChanges();
             }
         }
