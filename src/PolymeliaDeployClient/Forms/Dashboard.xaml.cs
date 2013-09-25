@@ -2,7 +2,6 @@
 
 namespace PolymeliaDeployClient.Forms
 {
-    using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
@@ -10,7 +9,6 @@ namespace PolymeliaDeployClient.Forms
     using System.Windows.Media;
 
     using PolymeliaDeploy.Controller;
-    using PolymeliaDeploy.Data;
 
     using Environment = PolymeliaDeploy.Data.Environment;
 
@@ -40,27 +38,18 @@ namespace PolymeliaDeployClient.Forms
             historyGrid.RowDefinitions.Clear();
 
             historyGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(30) });
+            historyGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(550) });
 
             AddEnvironmentColumns();
             AddLastestDeployHistoryForEnvironments();
-
-
-            try
-            {
-                dashboardHeaderTextBlock.Foreground = new SolidColorBrush(Color.FromRgb(106, 196, 234));
-                dashboardHeaderTextBlock.Text = "Show deployment history";
-            }
-            catch (Exception)
-            {
-                dashboardHeaderTextBlock.Foreground = new SolidColorBrush(Color.FromRgb(176, 100, 100));
-                dashboardHeaderTextBlock.Text = "Can't connect to remote server";
-            }
         }
 
 
         private void AddLastestDeployHistoryForEnvironments()
         {
             var columnIndex = 0;
+
+            var histoyDeployDataTemplate = FindResource("DeployHistoryDataTemplate") as DataTemplate;
 
             foreach (var environment in Environments)
             {
@@ -71,86 +60,38 @@ namespace PolymeliaDeployClient.Forms
                     {
                         if (!history.IsFaulted)
                         {
-                            var rowIndex = 1;
-                            
-                            foreach (var mainActivity in history.Result)
-                            {
-                                historyGrid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(100) });
+                            dashboardHeaderTextBlock.Foreground = new SolidColorBrush(Color.FromRgb(106, 196, 234));
+                            dashboardHeaderTextBlock.Text = "Show deployment history";
 
-                                historyGrid.Children.Add(
-                                    CreateDeployVersionBox(
-                                        mainActivity,
-                                        gridRow: rowIndex,
-                                        gridColumn: index,
-                                        color: ConvertStatusToColor(mainActivity)));
+                            var historyListBox = new ItemsControl
+                                                {
+                                                     Height = 550,
+                                                     Width = 260,
+                                                     BorderBrush = null,
+                                                     BorderThickness = new Thickness(0),
+                                                     HorizontalAlignment = HorizontalAlignment.Left,
+                                                     VerticalAlignment = VerticalAlignment.Top,
+                                                     Margin = new Thickness(0)
+                                                 };
 
-                                rowIndex++;
-                            }
+                            Grid.SetRow(historyListBox, 1);
+                            Grid.SetColumn(historyListBox, index);
+
+                            historyListBox.ItemTemplate = histoyDeployDataTemplate;
+                            historyListBox.ItemsSource = history.Result;
+
+                            historyGrid.Children.Add(historyListBox);
                         }
+                        else
+                        {
+                            dashboardHeaderTextBlock.Foreground = new SolidColorBrush(Color.FromRgb(176, 100, 100));
+                            dashboardHeaderTextBlock.Text = "Can't connect to remote server";
+                        }
+
                     }, TaskScheduler.FromCurrentSynchronizationContext());
 
                 columnIndex++;
             }
-        }
-
-        private static Color ConvertStatusToColor(Deployment deployment)
-        {
-            Color color;
-
-            if (deployment.Status == ActivityStatus.Completed)
-                color = Color.FromRgb(200, 255, 200);
-            else if (deployment.Status == ActivityStatus.Failed)
-                color = Color.FromRgb(255, 180, 180);
-            else
-                color = Color.FromRgb(200, 200, 200);
-
-            return color;
-        }
-
-        private static UIElement CreateDeployVersionBox(
-                                                        Deployment deployment,
-                                                        Color color,
-                                                        int gridColumn = 0,
-                                                        int gridRow = 0)
-        {
-            var box = new StackPanel
-                      {
-                          Background = new SolidColorBrush(color),
-                          Width = 250,
-                          Height = 80,
-                          Margin = new Thickness(0, 10, 50, 10),
-                          HorizontalAlignment = HorizontalAlignment.Left,
-                          VerticalAlignment = VerticalAlignment.Top
-                      };
-
-            box.Children.Add(new TextBlock
-                             {
-                                 FontSize = 14,
-                                 Text = "VERSION: " + deployment.Version,
-                                 HorizontalAlignment = HorizontalAlignment.Left,
-                                 Margin = new Thickness(8, 8, 8, 4)
-                             });
-
-            box.Children.Add(new TextBlock
-                            {
-                                FontSize = 14,
-                                Text = deployment.Created.ToString("ddd MMM M yyyy hh:mm tt"),
-                                HorizontalAlignment = HorizontalAlignment.Left,
-                                Margin = new Thickness(8, 4, 8, 4)
-                            });
-
-            box.Children.Add(new TextBlock
-                            {
-                                FontSize = 12,
-                                Text = "DEPLOYED BY: " + deployment.CreatedBy,
-                                HorizontalAlignment = HorizontalAlignment.Left,
-                                Margin = new Thickness(8, 4 ,8, 8)
-                            });
-
-            Grid.SetColumn(box, gridColumn);
-            Grid.SetRow(box, gridRow);
-
-            return box;
         }
 
 

@@ -2,7 +2,9 @@
 {
     public enum AgentStatus
     {
+        NotConfirmed,
+        InProgress,
         Ready,
-        InProgress
+        NotActive
     }
 }

@@ -95,6 +95,7 @@
     <Compile Include="Configuration\IControllerConfigurationSettings.cs" />
     <Compile Include="Hub\DeployControllerHub.cs" />
     <Compile Include="Modules\ActivitiesModule.cs" />
+    <Compile Include="Modules\AgentModule.cs" />
     <Compile Include="Modules\ReportModule.cs" />
     <Compile Include="Modules\VariableModule.cs" />
     <Compile Include="Modules\EnvironmentsModule.cs" />

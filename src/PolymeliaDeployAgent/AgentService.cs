@@ -8,6 +8,7 @@ using System;
 namespace PolymeliaDeploy.Agent
 {
     using System.Collections.Generic;
+    using PolymeliaDeploy.Security;
 
     public class AgentService : IAgentService
     {
@@ -16,21 +17,25 @@ namespace PolymeliaDeploy.Agent
         private readonly IDeployControllerClient _deployControllerClient;
         private readonly IAgentConfigurationSettings _agentConfig;
         private readonly ITaskActivityExecutioner _taskActivityExecutioner;
+        private readonly ITokenManagement _tokenManagement;
 
         private AgentStatus _agentStatus = AgentStatus.Ready;
 
         public AgentService(
                             IDeployControllerClient deployControllerClient,
                             IAgentConfigurationSettings agentConfig,
-                            ITaskActivityExecutioner taskActivityExecutioner)
+                            ITaskActivityExecutioner taskActivityExecutioner,
+                            ITokenManagement tokenManagement)
         {
             if (deployControllerClient == null) throw new ArgumentNullException("deployControllerClient");
             if (agentConfig == null) throw new ArgumentNullException("agentConfig");
             if (taskActivityExecutioner == null) throw new ArgumentNullException("taskActivityExecutioner");
+            if (tokenManagement == null) throw new ArgumentNullException("tokenManagement");
 
             _deployControllerClient = deployControllerClient;
             _agentConfig = agentConfig;
             _taskActivityExecutioner = taskActivityExecutioner;
+            _tokenManagement = tokenManagement;
         }
 
 
@@ -41,7 +46,7 @@ namespace PolymeliaDeploy.Agent
             _deployControllerClient.Connect(
                                             _agentConfig.DeployControllerUrl,
                                             _agentConfig.ServerRole,
-                                            _agentConfig.ControllerKey);
+                                            _tokenManagement.Generate(_agentConfig.ControllerKey));
         }
 
 

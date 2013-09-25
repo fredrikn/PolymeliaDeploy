@@ -18,7 +18,9 @@ namespace PolymeliaDeployClient
 
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
-        private IEnvironmentClient _environmentClient;
+        private readonly IEnvironmentClient _environmentClient;
+
+        private readonly IAgentRemoteClient _agentRemoteClient;
 
         private readonly ObservableCollection<Environment> _environments = new ObservableCollection<Environment>();
 
@@ -37,6 +39,7 @@ namespace PolymeliaDeployClient
             DataContext = this;
 
             _environmentClient = new EnvironmentRemoteClient();
+            _agentRemoteClient = new AgentRemoteClient();
 
             environmentTabs.ItemsSource = _environments;
         }
@@ -342,6 +345,23 @@ namespace PolymeliaDeployClient
             dashboard.LoadHistory();
 
             contentGrid.Children.Add(dashboard);
+        }
+
+
+        private void viewSettingsButton_Click(object sender, RoutedEventArgs e)
+        {
+            foreach (var child in contentGrid.Children.OfType<Settings>())
+            {
+                child.Visibility = Visibility.Visible;
+                child.LoadAgents();
+                return;
+            }
+
+            var settings = new Settings(_agentRemoteClient);
+            settings.LoadAgents();
+
+
+            contentGrid.Children.Add(settings);
         }
     }
 }

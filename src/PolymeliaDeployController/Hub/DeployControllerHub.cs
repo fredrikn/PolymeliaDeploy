@@ -26,22 +26,26 @@ namespace PolymeliaDeployController.Hub
         private readonly IActivityRepository _activityRepository;
         private readonly IAgentRepository _agentRepository;
         private readonly IControllerConfigurationSettings _controllerSettings;
+        private readonly ITokenManagement _tokenManagement;
 
         public DeployControllerHub(
                                    IReportRepository reportRepository,
                                    IActivityRepository activityRepository,
                                    IAgentRepository agentRepository,
-                                   IControllerConfigurationSettings controllerSettings)
+                                   IControllerConfigurationSettings controllerSettings,
+                                   ITokenManagement tokenManagement)
         {
             if (reportRepository == null) throw new ArgumentNullException("reportRepository");
             if (activityRepository == null) throw new ArgumentNullException("activityRepository");
             if (agentRepository == null) throw new ArgumentNullException("agentRepository");
             if (controllerSettings == null) throw new ArgumentNullException("controllerSettings");
+            if (tokenManagement == null) throw new ArgumentNullException("tokenManagement");
 
             _reportRepository = reportRepository;
             _activityRepository = activityRepository;
             _agentRepository = agentRepository;
             _controllerSettings = controllerSettings;
+            _tokenManagement = tokenManagement;
         }
 
 
@@ -54,7 +58,7 @@ namespace PolymeliaDeployController.Hub
             if (string.IsNullOrWhiteSpace(controllerKey))
                 throw new UnauthorizedAccessException("Access denied!");
 
-            if (!controllerKey.Equals(TokenGenerator.Generate(_controllerSettings.ControllerKey)))
+            if (!_tokenManagement.IsEqual(controllerKey, _tokenManagement.Generate(_controllerSettings.ControllerKey)))
                 throw new UnauthorizedAccessException("Access denied!");
 
             RegisterAgent(roleName, GetAgentIpAddress(), serverName);

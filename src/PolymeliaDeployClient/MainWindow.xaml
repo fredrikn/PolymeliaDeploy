@@ -132,6 +132,15 @@
 
                     <Rectangle Height="14" Fill="White" Width="1"/>
 
+                    <Button
+						x:Name="viewSettingsButton"
+						ToolTip="Settings"
+						Content="SETTINGS"
+						Margin="10,0,15,0"
+						FontSize="11"
+						Style="{StaticResource linkButton}" Height="30" VerticalAlignment="Top" Click="viewSettingsButton_Click"/>
+
+                    <Rectangle Height="14" Fill="White" Width="1"/>
 
                     <Button
 						x:Name="aboutButton"

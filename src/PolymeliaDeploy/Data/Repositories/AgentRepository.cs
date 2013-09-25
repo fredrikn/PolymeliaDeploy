@@ -1,5 +1,6 @@
 ﻿namespace PolymeliaDeploy.Data.Repositories
 {
+    using System.Collections.Generic;
     using System.Data;
     using System.Linq;
 
@@ -21,6 +22,14 @@
             {
                 return db.Agents.FirstOrDefault(a => a.ServerName == serverName &&
                                                      a.Role == role);
+            }
+        }
+
+        public IEnumerable<Agent> GetAll()
+        {
+            using (var db = new PolymeliaDeployDbContext())
+            {
+                return db.Agents.OrderBy( a => a.Role).ToList();
             }
         }
 

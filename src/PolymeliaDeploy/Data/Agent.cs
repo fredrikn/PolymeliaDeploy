@@ -2,7 +2,8 @@
 {
     using System;
     using System.ComponentModel.DataAnnotations.Schema;
-    using System.Net.Sockets;
+
+    using PolymeliaDeploy.Agent;
 
     public class Agent
     {
@@ -25,5 +26,21 @@
 
         [NotMapped]
         public bool IsBusy { get; set; }
+
+        [NotMapped]
+        public AgentStatus Status
+        {
+            get
+            {
+                if (!Confirmed.HasValue)
+                    return AgentStatus.NotConfirmed;
+
+                if (!IsActive)
+                    return AgentStatus.NotActive;
+
+                return IsBusy ? AgentStatus.InProgress : AgentStatus.Ready;
+            }
+        }
     }
+
 }

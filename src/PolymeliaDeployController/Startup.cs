@@ -4,6 +4,7 @@
     using Owin;
 
     using PolymeliaDeploy.Data.Repositories;
+    using PolymeliaDeploy.Security;
 
     using PolymeliaDeployController.Configuration;
     using PolymeliaDeployController.Hub;
@@ -21,7 +22,8 @@
                                                                                new ReportRepository(),
                                                                                new ActivityRepository(),
                                                                                new AgentRepository(),
-                                                                               new ControllerConfigurationSettings()));
+                                                                               new ControllerConfigurationSettings(),
+                                                                               new TokenManagement()));
 
             app.MapHubs(config);
 

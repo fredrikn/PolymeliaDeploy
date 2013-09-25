@@ -101,6 +101,8 @@
     <Compile Include="Activities\PolymeliaNativiveActivity.cs" />
     <Compile Include="Activities\PullDeployAgentSequence.cs" />
     <Compile Include="Agent\AgentStatus.cs" />
+    <Compile Include="Controller\AgentRemoteClient.cs" />
+    <Compile Include="Controller\IAgentRemoteClient.cs" />
     <Compile Include="Data\Agent.cs" />
     <Compile Include="Data\DeployVariable.cs" />
     <Compile Include="Data\Repositories\ActivityRepository.cs" />
@@ -113,7 +115,8 @@
     <Compile Include="Data\Repositories\ReportRepository.cs" />
     <Compile Include="DeployController\IDeployConrollerReportClient.cs" />
     <Compile Include="DeployController\IDeployControllerClient.cs" />
-    <Compile Include="Security\TokenGenerator.cs" />
+    <Compile Include="Security\ITokenManagement.cs" />
+    <Compile Include="Security\TokenManagement.cs" />
     <Compile Include="Workflow\IWorkflowRunner.cs" />
     <Compile Include="Workflow\PolymeliaTrackingParticipant.cs" />
     <Compile Include="Workflow\IgnorableXamlXmlWriter.cs" />

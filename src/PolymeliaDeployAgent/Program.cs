@@ -6,6 +6,7 @@ using PolymeliaDeploy.Agent.Activity;
 
 namespace PolymeliaDeploy.Agent
 {
+    using PolymeliaDeploy.Security;
     using PolymeliaDeploy.Workflow;
 
     using Environment = System.Environment;
@@ -30,11 +31,13 @@ namespace PolymeliaDeploy.Agent
             var deployControllerClient = new DeployControllerClient();
             var workflowRunner = new WorkflowRunner(new PolymeliaTrackingParticipantFactory().CreateTrackingParticipant(deployControllerClient));
             var taskExecutioner = new TaskActivityExecutioner(workflowRunner);
+            var tokenManagement = new TokenManagement();
 
             return new AgentService(
                                     deployControllerClient,
                                     agentConfig,
-                                    taskExecutioner);
+                                    taskExecutioner,
+                                    tokenManagement);
         }
 
 

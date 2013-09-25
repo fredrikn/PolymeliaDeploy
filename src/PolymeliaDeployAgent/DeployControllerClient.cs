@@ -13,8 +13,6 @@ namespace PolymeliaDeploy.Agent
     using System.Linq;
     using System.Threading;
 
-    using PolymeliaDeploy.Security;
-
     public class DeployControllerClient : IDeployControllerClient, IDeployConrollerReportClient
     {
         private bool _isRunning;
@@ -118,7 +116,7 @@ namespace PolymeliaDeploy.Agent
 
             _hubConnection.Headers.Add("AgentRoleName", serverRole);
             _hubConnection.Headers.Add("AgentServerName", System.Environment.MachineName);
-            _hubConnection.Headers.Add("ControllerKey", TokenGenerator.Generate(controllerKey));
+            _hubConnection.Headers.Add("ControllerKey", controllerKey);
 
             _hubProxy.On<IEnumerable<ActivityTaskDto>>("RunActivities", RunActivities);
 
