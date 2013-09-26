@@ -1,0 +1,107 @@
+﻿<UserControl x:Class="PolymeliaDeployClient.Forms.Settings"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:converters="clr-namespace:PolymeliaDeployClient.Forms.Converters"
+             Background="White"
+             x:Name="settingsControl"
+             Foreground="Black">
+
+    <UserControl.Resources>
+
+        <converters:AgentStatusConverter x:Key="AgentStatusConverter"/>
+
+        <DataTemplate x:Key="AgentDataTemplate">
+            <Grid Margin="5" Background="{Binding Path=Status, Converter={StaticResource AgentStatusConverter}}">
+                <StackPanel Margin="5" Height="80" VerticalAlignment="Top" HorizontalAlignment="Left">
+                    <TextBlock FontSize="14" Text="{Binding Path=Role, StringFormat=ROLE: {0}}" HorizontalAlignment="Left" Margin="8,8,8,4" />
+                    <TextBlock FontSize="14" Text="{Binding Path=ServerName, StringFormat=SERVER: {0}}" HorizontalAlignment="Left" Margin="8,4,8,4" />
+                    <TextBlock FontSize="12" Text="{Binding Path=ConfirmedBy, StringFormat=CONFIRMED BY: {0}}" HorizontalAlignment="Left" Margin="8,4,8,8"/>
+                </StackPanel>
+            </Grid>
+        </DataTemplate>
+
+    </UserControl.Resources>
+
+    <Grid Margin="20">
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="60"/>
+        </Grid.RowDefinitions>
+
+        <Grid Margin="0,0,0,0">
+
+            <StackPanel VerticalAlignment="Center">
+
+                <TextBlock
+                    VerticalAlignment="Center"
+                    FontSize="12"
+                    Foreground="#aaaaaa"
+                    FontWeight="Black"
+                    Margin="0,0,0,8"
+                    Text="SETTINGS"/>
+
+                <TextBlock
+                    Name="settingsHeaderTextBlock"
+                    VerticalAlignment="Center"
+                    FontSize="20"
+                    Foreground="DarkOrange"
+                    Text="Please wait while loading settings..."/>
+
+            </StackPanel>
+
+        </Grid>
+
+
+        <Grid Grid.Row="1" Margin="0,20,0,0">
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="25"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            
+            <TextBlock FontSize="15">AGENTS</TextBlock>
+            
+            <Grid Grid.Row="1" Margin="0,10,0,0" Name="agentsGrid">
+
+                <ItemsControl
+                        ItemTemplate="{StaticResource AgentDataTemplate}"
+                        Name="agentsItemsControl"
+                        Width="250"
+                        BorderBrush="Transparent"
+                        BorderThickness="0"
+                        ItemsSource="{Binding ElementName=settingsControl, Path=Agents}"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Top"
+                        Margin = "0">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel Orientation="Horizontal"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+
+                </ItemsControl>
+
+            </Grid>
+
+        </Grid>
+        
+
+        <Grid Grid.Row="2">
+
+            <StackPanel Orientation="Horizontal" Margin="8" HorizontalAlignment="Right">
+
+                <Button
+                        Name="closeButton"
+                        Height="30"
+                        Width="70"
+                        HorizontalAlignment="Right"
+                        Content="CLOSE" Click="CloseButton_OnClick"/>
+
+            </StackPanel>
+
+        </Grid>
+
+    </Grid>
+</UserControl>
