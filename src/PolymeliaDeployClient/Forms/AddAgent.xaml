@@ -1,0 +1,96 @@
+﻿<Window x:Class="PolymeliaDeployClient.Forms.AddAgent"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Height="450"
+        Foreground="black"
+        Background="White"
+        WindowStyle="None"
+        WindowStartupLocation="CenterOwner"
+        AllowsTransparency="True"
+        ResizeMode="CanResizeWithGrip"
+        Width="650">
+
+    <Grid Margin="30">
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="65"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="40"/>
+        </Grid.RowDefinitions>
+
+        <Grid>
+            <StackPanel VerticalAlignment="Center" Margin="0,4,0,4">
+
+                <TextBlock
+                    VerticalAlignment="Center"
+                    FontSize="12"
+                    Foreground="#aaaaaa"
+                    FontWeight="Black"
+                    Margin="0,0,0,8"
+                    Text="REGISTER AGENT"/>
+
+                <TextBlock
+                    VerticalAlignment="Center"
+                    FontSize="25"
+                    Foreground="#6ac4ea"
+                    Text="Register a new agent"/>
+
+            </StackPanel>
+
+        </Grid>
+
+        <Grid Grid.Row="1" Margin="0,20,0,0">
+
+            <StackPanel VerticalAlignment="Top"  Margin="0,0,0,0" Grid.Row="1">
+
+                <TextBlock Text="ROLE" Margin="0,4,0,2"></TextBlock>
+                <TextBox
+                    VerticalContentAlignment="Center"
+                    Name="roleName"
+                    Height="30"
+                    MaxLength="50"
+                    Margin="0,2,0,15"
+                    TextChanged="RoleName_OnTextChanged"
+                    ></TextBox>
+
+                <TextBlock Text="SERVER" Margin="0,4,0,2"></TextBlock>
+                <TextBox
+                    VerticalContentAlignment="Center"
+                    Name="serverName"
+                    Height="30"
+                    MaxLength="50"
+                    Margin="0,2,0,15"
+                    TextChanged="ServerName_OnTextChanged"
+                    ></TextBox>
+
+                <TextBlock Text="AGENT TOKEN" Margin="0,4,0,2"></TextBlock>
+                <TextBox
+                    VerticalContentAlignment="Center"
+                    Name="agentToken"
+                    Height="30"
+                    MaxLength="50"
+                    TextChanged="AgentToken_OnTextChanged"
+                    Margin="0,2,0,15"></TextBox>
+
+                <TextBlock Text="ACTIVE" Margin="0,4,0,2" ></TextBlock>
+                <CheckBox
+                    Name="IsActiveCheckBox"
+                    Height="80"
+                    Margin="0,2,0,15"></CheckBox>
+
+            </StackPanel>
+
+        </Grid>
+
+        <Grid Grid.Row="2">
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Name="saveButton" IsEnabled="False" Content="SAVE" Margin="0,0,8,0" Width="70" Height="30" HorizontalAlignment="Right" Click="saveButton_Click"></Button>
+                <Button Name="cancelButton" Content="CANCEL" Width="70" Height="30" HorizontalAlignment="Right" Click="cancelButton_Click"></Button>
+            </StackPanel>
+
+        </Grid>
+
+    </Grid>
+</Window>
+

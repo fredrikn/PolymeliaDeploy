@@ -56,9 +56,31 @@ namespace PolymeliaDeployClient.Forms
 
         public ObservableCollection<Agent> Agents { get; set; } 
 
+
         private void CloseButton_OnClick(object sender, RoutedEventArgs e)
         {
             Visibility = Visibility.Collapsed;
+        }
+
+
+        private void addButton_Click(object sender, RoutedEventArgs e)
+        {
+            var registerAgent = new AddAgent();
+            registerAgent.Owner = Window.GetWindow(this);
+
+            var blockBackgroundGrid = (Grid)Window.GetWindow(this).FindName("blockBackgroundGrid");
+
+            blockBackgroundGrid.Visibility = Visibility.Visible;
+
+            registerAgent.ShowDialog();
+
+            blockBackgroundGrid.Visibility = Visibility.Hidden;
+
+        }
+
+        private void removeButton_Click(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }

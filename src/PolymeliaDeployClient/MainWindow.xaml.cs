@@ -360,7 +360,6 @@ namespace PolymeliaDeployClient
             var settings = new Settings(_agentRemoteClient);
             settings.LoadAgents();
 
-
             contentGrid.Children.Add(settings);
         }
     }
