@@ -78,11 +78,14 @@
     </Compile>
     <Compile Include="Forms\Converters\AgentStatusConverter.cs" />
     <Compile Include="Forms\Converters\DeploymentStatusConverter.cs" />
-    <Compile Include="Forms\Dashboard.xaml.cs">
-      <DependentUpon>Dashboard.xaml</DependentUpon>
+    <Compile Include="Forms\Deployments.xaml.cs">
+      <DependentUpon>Deployments.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Forms\Settings.xaml.cs">
-      <DependentUpon>Settings.xaml</DependentUpon>
+    <Compile Include="Forms\SelectAgents.xaml.cs">
+      <DependentUpon>SelectAgents.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\ListAgents.xaml.cs">
+      <DependentUpon>ListAgents.xaml</DependentUpon>
     </Compile>
     <Compile Include="Workflow\ValidationError.cs" />
     <Page Include="Controls\WorkflowDesignerControl.xaml">
@@ -97,7 +100,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Forms\Dashboard.xaml">
+    <Page Include="Forms\Deployments.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -105,7 +108,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Forms\Settings.xaml">
+    <Page Include="Forms\SelectAgents.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Forms\ListAgents.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -178,7 +185,9 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\PolymeliaDeploy\PolymeliaDeploy.csproj">

@@ -13,6 +13,8 @@
         
         public string ServerName { get; set; }
 
+        public int? EnvironmentId { get; set; }
+
         public string IpAddress { get; set; }
 
         public string ConfirmedBy { get; set; }

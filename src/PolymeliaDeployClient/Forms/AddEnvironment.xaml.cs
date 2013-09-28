@@ -49,5 +49,17 @@ namespace PolymeliaDeployClient.Forms
         {
            okButton.IsEnabled = !string.IsNullOrWhiteSpace(environmentName.Text);
         }
+
+        private void addButton_Click(object sender, RoutedEventArgs e)
+        {
+            Opacity = 0.20;
+
+            var selectAgents = new SelectAgents();
+            selectAgents.Owner = this;
+
+            selectAgents.ShowDialog();
+
+            Opacity = 1;
+        }
     }
 }

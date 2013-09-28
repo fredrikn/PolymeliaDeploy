@@ -14,6 +14,56 @@
             <MenuItem Header="Remove" Click="RemoveMenuItem_Click" CommandParameter="{Binding Parent, RelativeSource={RelativeSource Self}}"/>
         </ContextMenu>
 
+        <Style TargetType="{x:Type TabItem}" x:Key="tabMenyStyle">
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Margin" Value="0"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type TabItem}">
+
+                        <Grid Height="30">
+                            <Border 
+									x:Name="Border"
+									Margin="0,0,0,0" 
+									Background="#ff71b1d1"
+									BorderBrush="Transparent" 
+									BorderThickness="0">
+                                
+                                <ContentPresenter x:Name="ContentSite"
+												        VerticalAlignment="Center"
+												        HorizontalAlignment="Left"
+												        ContentSource="Header"
+												        Margin="26,0,0,0"
+												        RecognizesAccessKey="True"/>
+
+                                <Border.Style>
+                                    <Style>
+                                        <Style.Triggers>
+                                            <Trigger Property="Border.IsMouseOver" Value="True">
+                                                <Setter Property="Border.Background" Value="#6ac4ea" />
+                                                <Setter Property="Border.Cursor" Value="Hand"/>
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
+                            </Border>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter Property="Panel.ZIndex" Value="100" />
+                                <Setter Property="Foreground" Value="#555555"></Setter>
+                                <Setter TargetName="Border" Property="Background" Value="White" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+
         <Style TargetType="{x:Type TextBox}">
             <Setter Property="Margin" Value="4"/>
             <Setter Property="Padding" Value="2"/>
@@ -121,24 +171,23 @@
 
                 <StackPanel Orientation="Horizontal">
 
-
                     <Button
-						x:Name="viewDashboardButton"
-						ToolTip="View Dashvboard"
-						Content="DASHBOARD"
+						x:Name="feedbackButton"
+						ToolTip="Send feedback"
+						Content="FEEDBACK"
 						Margin="10,0,15,0"
 						FontSize="11"
-						Style="{StaticResource linkButton}" Height="30" VerticalAlignment="Top" Click="viewDashboardButton_Click"/>
+						Style="{StaticResource linkButton}" Height="30" VerticalAlignment="Top"/>
 
                     <Rectangle Height="14" Fill="White" Width="1"/>
-
+                    
                     <Button
 						x:Name="viewSettingsButton"
 						ToolTip="Settings"
 						Content="SETTINGS"
 						Margin="10,0,15,0"
 						FontSize="11"
-						Style="{StaticResource linkButton}" Height="30" VerticalAlignment="Top" Click="viewSettingsButton_Click"/>
+						Style="{StaticResource linkButton}" IsEnabled="False" Height="30" VerticalAlignment="Top" Click="viewSettingsButton_Click"/>
 
                     <Rectangle Height="14" Fill="White" Width="1"/>
 
@@ -238,59 +287,73 @@
         </Grid>
 
 
-        <Grid Grid.Row="1" Margin="0" Name="contentGrid">
+        <Grid Grid.Row="1" Name="contentGrid" Background="#ff71b1d1">
 
-            <TabControl
-				x:Name="environmentTabs"
-				BorderThickness="0"
-				Margin="0"
-				Background="White"
-				DisplayMemberPath="Name"
-				SelectedItem="{Binding SelectedEnvironment, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+            <TabControl Name="mainTabs" Background="White" BorderThickness="0" Margin="0" BorderBrush="Transparent" SelectionChanged="mainTabs_SelectionChanged">
 
-                <TabControl.Resources>
-                    <DataTemplate x:Key="contentTemplate" x:Shared="False">
-                        <Controls:WorkflowDesignerControl SelectedEnvironment="{Binding}" />
-                    </DataTemplate>
+                <TabItem Tag="environments" Header="ENVIRONMENTS" Width="200" Style="{StaticResource tabMenyStyle}">
+                    
+                    <TabControl
+				        x:Name="environmentTabs"
+				        BorderThickness="0"
+				        Margin="0"
+				        Background="White"
+				        DisplayMemberPath="Name"
+				        SelectedItem="{Binding SelectedEnvironment, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
 
-                    <Style TargetType="{x:Type TabItem}">
-                        <Setter Property="ContentTemplate" Value="{StaticResource contentTemplate}"/>
-                        <Setter Property="ContextMenu" Value="{StaticResource EnvironmentContextMenu}"/>
-                        <Setter Property="Foreground" Value="White"/>
-                        <Setter Property="Margin" Value="0"/>
-                        <Setter Property="BorderThickness" Value="0"/>
-                        <Setter Property="Padding" Value="0"/>
-                        <Setter Property="Cursor" Value="Hand"/>
-                        <Setter Property="Template">
-                            <Setter.Value>
-                                <ControlTemplate TargetType="{x:Type TabItem}">
-                                    <Grid Height="35" Width="120">
-                                        <Border 
-											x:Name="Border"
-											Margin="0,0,1,0" 
-											Background="#6ac4ea"
-											BorderBrush="#6ac4ea" 
-											BorderThickness="0">
-                                            <ContentPresenter x:Name="ContentSite"
-												VerticalAlignment="Center"
-												HorizontalAlignment="Left"
-												ContentSource="Header"
-												Margin="26,0,0,0"
-												RecognizesAccessKey="True"/>
-                                        </Border>
-                                    </Grid>
-                                    <ControlTemplate.Triggers>
-                                        <Trigger Property="IsSelected" Value="True">
-                                            <Setter Property="Panel.ZIndex" Value="100" />
-                                            <Setter TargetName="Border" Property="Background"
-												Value="#3aa0cc" />
-                                        </Trigger>
-                                    </ControlTemplate.Triggers>
-                                </ControlTemplate>
-                            </Setter.Value>
-                        </Setter>
-                    </Style>
-                </TabControl.Resources>
+                        <TabControl.Resources>
+                            <DataTemplate x:Key="contentTemplate" x:Shared="False">
+                                <Controls:WorkflowDesignerControl SelectedEnvironment="{Binding}" />
+                            </DataTemplate>
+
+                            <Style TargetType="{x:Type TabItem}">
+                                <Setter Property="ContentTemplate" Value="{StaticResource contentTemplate}"/>
+                                <Setter Property="ContextMenu" Value="{StaticResource EnvironmentContextMenu}"/>
+                                <Setter Property="Foreground" Value="White"/>
+                                <Setter Property="Margin" Value="0"/>
+                                <Setter Property="BorderThickness" Value="0"/>
+                                <Setter Property="Padding" Value="0"/>
+                                <Setter Property="Cursor" Value="Hand"/>
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="{x:Type TabItem}">
+                                            <Grid Height="35" Width="120">
+                                                <Border 
+											        x:Name="Border"
+											        Margin="0,0,1,0" 
+											        Background="#6ac4ea"
+											        BorderBrush="#6ac4ea" 
+											        BorderThickness="0">
+                                                    <ContentPresenter x:Name="ContentSite"
+												        VerticalAlignment="Center"
+												        HorizontalAlignment="Left"
+												        ContentSource="Header"
+												        Margin="26,0,0,0"
+												        RecognizesAccessKey="True"/>
+                                                </Border>
+                                            </Grid>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsSelected" Value="True">
+                                                    <Setter Property="Panel.ZIndex" Value="100" />
+                                                    <Setter TargetName="Border" Property="Background"
+												        Value="#3aa0cc" />
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </TabControl.Resources>
+                    </TabControl>
+
+                </TabItem>
+
+                <TabItem Tag="agents" x:Name="agentTabItem" Header="AGENTS" Width="200" Style="{StaticResource tabMenyStyle}">
+                </TabItem>
+
+                <TabItem Tag="deployments" x:Name="deploymentsTabItem" Header="DEPLOYMENTS" Width="200" Style="{StaticResource tabMenyStyle}">
+                </TabItem>
+
             </TabControl>
 
         </Grid>

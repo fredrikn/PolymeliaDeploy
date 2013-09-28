@@ -33,7 +33,7 @@
                     VerticalAlignment="Center"
                     FontSize="25"
                     Foreground="#6ac4ea"
-                    Text="Register a new agent"/>
+                    Text="register a new agent"/>
 
             </StackPanel>
 

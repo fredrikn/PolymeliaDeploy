@@ -14,11 +14,11 @@ namespace PolymeliaDeployClient.Forms
     /// <summary>
     /// Interaction logic for Settings.xaml
     /// </summary>
-    public partial class Settings : UserControl
+    public partial class ListAgents : UserControl
     {
         private readonly IAgentRemoteClient _agentRemoteClient;
 
-        public Settings(IAgentRemoteClient agentRemoteClient)
+        public ListAgents(IAgentRemoteClient agentRemoteClient)
         {
             if (agentRemoteClient == null) throw new ArgumentNullException("agentRemoteClient");
 
@@ -38,12 +38,12 @@ namespace PolymeliaDeployClient.Forms
                     if (t.IsFaulted)
                     {
                         settingsHeaderTextBlock.Foreground = new SolidColorBrush(Color.FromRgb(176, 100, 100));
-                        settingsHeaderTextBlock.Text = "Can't connect to remote server";
+                        settingsHeaderTextBlock.Text = "can't connect to remote server";
                         return;
                     }
 
                     settingsHeaderTextBlock.Foreground = new SolidColorBrush(Color.FromRgb(106, 196, 234));
-                    settingsHeaderTextBlock.Text = "Show settings";
+                    settingsHeaderTextBlock.Text = "show settings";
 
                     Agents.Clear();
 

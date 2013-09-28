@@ -13,15 +13,15 @@ namespace PolymeliaDeployClient.Forms
     using Environment = PolymeliaDeploy.Data.Environment;
 
     /// <summary>
-    /// Interaction logic for Dashboard.xaml
+    /// Interaction logic for Deployments.xaml
     /// </summary>
-    public partial class Dashboard : UserControl
+    public partial class Deployments : UserControl
     {
         private readonly IActivityClient _client;
 
         public IEnumerable<Environment> Environments { get; set; }
 
-        public Dashboard()
+        public Deployments()
         {
             _client = new ActivityRemoteClient();
 
@@ -61,7 +61,7 @@ namespace PolymeliaDeployClient.Forms
                         if (!history.IsFaulted)
                         {
                             dashboardHeaderTextBlock.Foreground = new SolidColorBrush(Color.FromRgb(106, 196, 234));
-                            dashboardHeaderTextBlock.Text = "Show deployment history";
+                            dashboardHeaderTextBlock.Text = "show deployment history";
 
                             var historyListBox = new ItemsControl
                                                 {
@@ -85,7 +85,7 @@ namespace PolymeliaDeployClient.Forms
                         else
                         {
                             dashboardHeaderTextBlock.Foreground = new SolidColorBrush(Color.FromRgb(176, 100, 100));
-                            dashboardHeaderTextBlock.Text = "Can't connect to remote server";
+                            dashboardHeaderTextBlock.Text = "can't connect to remote server";
                         }
 
                     }, TaskScheduler.FromCurrentSynchronizationContext());
@@ -112,12 +112,6 @@ namespace PolymeliaDeployClient.Forms
 
                 columnIndex++;
             }
-        }
-
-
-        private void CloseButton_OnClick(object sender, RoutedEventArgs e)
-        {
-            Visibility = Visibility.Collapsed;
         }
     }
 }

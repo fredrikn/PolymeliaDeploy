@@ -329,38 +329,35 @@ namespace PolymeliaDeployClient
         }
 
 
-        private void viewDashboardButton_Click(object sender, RoutedEventArgs e)
+        private void viewSettingsButton_Click(object sender, RoutedEventArgs e)
         {
-            foreach (var child in contentGrid.Children.OfType<Dashboard>())
-            {
-                child.Visibility = Visibility.Visible;
-                child.Environments = _environments;
-                child.LoadHistory();
-                return;
-            }
-            
-            var dashboard = new Dashboard();
-            
-            dashboard.Environments = _environments;
-            dashboard.LoadHistory();
-
-            contentGrid.Children.Add(dashboard);
         }
 
 
-        private void viewSettingsButton_Click(object sender, RoutedEventArgs e)
+        private void mainTabs_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            foreach (var child in contentGrid.Children.OfType<Settings>())
+            var tabItem = mainTabs.SelectedItem as TabItem;
+
+            if (tabItem != null && tabItem.Tag.ToString() == "deployments")
             {
-                child.Visibility = Visibility.Visible;
-                child.LoadAgents();
-                return;
+                tabItem.Content = null;
+
+                var dashboard = new Deployments();
+
+                dashboard.Environments = _environments;
+                dashboard.LoadHistory();
+
+                tabItem.Content = dashboard;
             }
+            else if (tabItem != null && tabItem.Tag.ToString() == "agents")
+            {
+                tabItem.Content = null;
 
-            var settings = new Settings(_agentRemoteClient);
-            settings.LoadAgents();
+                var listAgents = new ListAgents(_agentRemoteClient);
+                listAgents.LoadAgents();
 
-            contentGrid.Children.Add(settings);
+                tabItem.Content = listAgents;
+            }
         }
     }
 }
