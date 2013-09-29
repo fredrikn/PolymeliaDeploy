@@ -1,11 +1,14 @@
 ﻿namespace PolymeliaDeployController.Modules
 {
+    using System;
     using System.Linq;
 
     using Nancy;
     using Nancy.ModelBinding;
 
     using PolymeliaDeploy.Data;
+
+    using Environment = PolymeliaDeploy.Data.Environment;
 
     public class EnvironmentsModule : NancyModule
     {
@@ -62,7 +65,12 @@
                     db.Environments.Add(environment);
                     db.SaveChanges();
 
-                    return this.Response.AsJson(environment);
+                    foreach (var agent in environment.AssingedAgentIds.Select(agentId => db.Agents.SingleOrDefault(a => a.Id == agentId)).Where(agent => agent != null))
+                        agent.EnvironmentId = environment.Id;
+
+                    db.SaveChanges();
+
+                    return Response.AsJson(environment);
                 }
             };
 
@@ -77,7 +85,7 @@
                     environment.Deleted = true;
                     db.SaveChanges();
 
-                    return this.Response.AsJson(true);
+                    return Response.AsJson(true);
                 }
             };
         }

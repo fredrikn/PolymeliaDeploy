@@ -99,7 +99,7 @@
                         Height="30"
                         Width="70"
                         HorizontalAlignment="Right"
-                        Content="ADD"/>
+                        Content="ADD" Click="okButton_Click"/>
 
                 <Button
                         Name="cancelButton"

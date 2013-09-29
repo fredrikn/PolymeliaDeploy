@@ -1,6 +1,7 @@
 ﻿namespace PolymeliaDeploy.Data
 {
     using System;
+    using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations.Schema;
 
     public class Environment
@@ -24,5 +25,8 @@
 
         [NotMapped]
         public bool HasChanges { get; set; }
+
+        [NotMapped]
+        public IEnumerable<int> AssingedAgentIds { get; set; }
     }
 }

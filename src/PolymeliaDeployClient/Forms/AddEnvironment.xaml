@@ -1,7 +1,7 @@
 ﻿<Window x:Class="PolymeliaDeployClient.Forms.AddEnvironment"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Height="650"
+        Height="680"
         Foreground="black"
         Background="White"
         WindowStyle="None"
@@ -39,7 +39,7 @@
             
         </Grid>
 
-        <Grid Grid.Row="1" Margin="0,20,0,0">
+        <Grid Grid.Row="1" Margin="0,10,0,0">
             
             <StackPanel VerticalAlignment="Top"  Margin="0,0,0,0" Grid.Row="1">
 
@@ -49,8 +49,13 @@
                     Name="environmentName"
                     Height="30"
                     MaxLength="50"
-                    Margin="0,2,0,15"
+                    Margin="0,2,0,4"
                     TextChanged="environmentName_TextChanged"></TextBox>
+                <TextBlock TextWrapping="Wrap"
+                           FontStyle="Italic"
+                           Text="(The name of the environment, for example 'Dev'. If you use an deploy activity that will transform application configuration files, this name will be used as a part of locating the configuraiton file, for example 'web.dev.config'.)"
+                           Margin="0,0,0,10">
+                </TextBlock>
 
                 <TextBlock Text="COPY FROM" Margin="0,4,0,2" ></TextBlock>
                 <ComboBox
@@ -93,7 +98,7 @@
                            HorizontalAlignment="Left"
                            Margin="10,0,0,0"
                            IsEnabled="False"
-                           Content="DELETE"/>
+                           Content="REMOVE"/>
 
                     </StackPanel>
 
@@ -107,7 +112,9 @@
                         BorderBrush="White"
                         MinRowHeight="25"
                         Height="140"
-                        CanUserDeleteRows="false"
+                        CanUserDeleteRows="true"
+                        RowBackground="#6ac4ea"
+                        CanUserAddRows="False"
                         Name="agentsGrid"
                         AutoGenerateColumns="False"
                         HorizontalGridLinesBrush="SlateGray"
@@ -115,15 +122,22 @@
                         <DataGrid.Columns>
                             <DataGridTextColumn
                                 Width="250"
-                                Binding="{Binding VariableKey, Mode=TwoWay}" Header="Role" />
+                                IsReadOnly="True"
+                                Binding="{Binding Role, Mode=TwoWay}" Header="Role" />
                             <DataGridTextColumn
                                 Width="*"
-                                Binding="{Binding VariableValue, Mode=TwoWay}" Header="Server" />
+                                IsReadOnly="True"
+                                Binding="{Binding ServerName, Mode=TwoWay}" Header="Server" />
                         </DataGrid.Columns>
 
                     </DataGrid>
                 </Grid>
 
+                <TextBlock TextWrapping="Wrap"
+                           FontStyle="Italic"
+                           Text="(Add the agents that should belong to this environment. You can also add agents later.)"
+                           Margin="0,4,0,10">
+                </TextBlock>
 
             </StackPanel>
 

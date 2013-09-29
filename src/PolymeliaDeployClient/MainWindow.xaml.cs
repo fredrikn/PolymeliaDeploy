@@ -7,7 +7,6 @@ namespace PolymeliaDeployClient
     using System.Collections.ObjectModel;
     using System.ComponentModel;
     using System.Linq;
-    using System.Threading;
 
     using PolymeliaDeploy.Controller;
     using PolymeliaDeploy.Data;
@@ -31,9 +30,10 @@ namespace PolymeliaDeployClient
         public event PropertyChangedEventHandler PropertyChanged;
   
 
-
         public MainWindow()
         {
+            WindowStartupLocation = WindowStartupLocation.CenterScreen;
+
             InitializeComponent();
 
             DataContext = this;
@@ -194,18 +194,11 @@ namespace PolymeliaDeployClient
             win.Owner = this;
 
             win.Environments = _environments;
+            win.CurrentProject = CurrentProject;
 
             if (win.ShowDialog() == true)
             {
-                var environment = new Environment
-                                      {
-                                          ProjectId = CurrentProject.Id,
-                                          CreatedBy = Thread.CurrentPrincipal.Identity.Name,
-                                          Description = "",
-                                          Name = win.EnvironmentName,
-                                      };
-
-                environment = _environmentClient.AddEnvironment(environment);
+                var environment = win.AddedEnvironment;
 
                 _environments.Add(environment);
 

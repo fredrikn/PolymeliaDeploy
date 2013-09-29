@@ -1,7 +1,7 @@
 ﻿<Window x:Class="PolymeliaDeployClient.Forms.AddAgent"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Height="450"
+        Height="500"
         Foreground="black"
         Background="White"
         WindowStyle="None"
@@ -49,9 +49,10 @@
                     Name="roleName"
                     Height="30"
                     MaxLength="50"
-                    Margin="0,2,0,15"
+                    Margin="0,2,0,4"
                     TextChanged="RoleName_OnTextChanged"
                     ></TextBox>
+                <TextBlock FontStyle="Italic" Text="(Specify the name of the role of the agent, for example 'WebRole')" Margin="0,0,0,10"></TextBlock>
 
                 <TextBlock Text="SERVER" Margin="0,4,0,2"></TextBlock>
                 <TextBox
@@ -59,9 +60,10 @@
                     Name="serverName"
                     Height="30"
                     MaxLength="50"
-                    Margin="0,2,0,15"
+                    Margin="0,2,0,4"
                     TextChanged="ServerName_OnTextChanged"
                     ></TextBox>
+                <TextBlock FontStyle="Italic" Text="(The name of the machine where the agent is running)" Margin="0,0,0,10"></TextBlock>
 
                 <TextBlock Text="AGENT TOKEN" Margin="0,4,0,2"></TextBlock>
                 <TextBox
@@ -70,7 +72,8 @@
                     Height="30"
                     MaxLength="50"
                     TextChanged="AgentToken_OnTextChanged"
-                    Margin="0,2,0,15"></TextBox>
+                    Margin="0,2,0,4"></TextBox>
+                <TextBlock FontStyle="Italic" Text="(A security token of the agent, the agent most have this token configure on the machine it's running)" Margin="0,0,0,10"></TextBlock>
 
                 <TextBlock Text="ACTIVE" Margin="0,4,0,2" ></TextBlock>
                 <CheckBox

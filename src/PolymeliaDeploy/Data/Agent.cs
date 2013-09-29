@@ -23,7 +23,6 @@
 
         public bool IsActive { get; set; }
 
-
         public long? LastDeploymentId { get; set; }
 
         [NotMapped]
@@ -44,5 +43,4 @@
             }
         }
     }
-
 }

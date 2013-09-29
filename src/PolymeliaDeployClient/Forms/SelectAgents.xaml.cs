@@ -2,16 +2,20 @@
 
 namespace PolymeliaDeployClient.Forms
 {
+    using System.Collections.Generic;
     using System.Threading.Tasks;
     using System.Windows.Media;
 
     using PolymeliaDeploy.Controller;
+    using PolymeliaDeploy.Data;
 
     /// <summary>
     /// Interaction logic for SelectAgents.xaml
     /// </summary>
     public partial class SelectAgents : Window
     {
+        public IEnumerable<Agent> SelectedAgents { get; private set; }
+
         public SelectAgents()
         {
             InitializeComponent();
@@ -52,6 +56,18 @@ namespace PolymeliaDeployClient.Forms
         private void cancelButton_Click(object sender, RoutedEventArgs e)
         {
             DialogResult = false;
+        }
+
+        private void okButton_Click(object sender, RoutedEventArgs e)
+        {
+            var agents = new List<Agent>();
+            
+            foreach ( var selectedAgent in agentsDataGrid.SelectedItems)
+                agents.Add(selectedAgent as Agent);
+
+            SelectedAgents = agents;
+
+            DialogResult = true;
         }
     }
 }
