@@ -296,16 +296,12 @@ namespace PolymeliaDeployClient
 
         private void AlertOnUnsavedChanges()
         {
-            if (SomethingToSave())
-            {
-                if (MessageBox.Show("Do you want to save the unsaved changes?", "Unsaved changes", MessageBoxButton.YesNo)
-                    == MessageBoxResult.Yes)
-                {
-                    Save();
-                }
-            }
-        }
+            if (!this.SomethingToSave())
+                return;
 
+            if (MessageBox.Show("Do you want to save the unsaved changes?", "Unsaved changes", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                this.Save();
+        }
 
         private void variableButton_Click(object sender, RoutedEventArgs e)
         {

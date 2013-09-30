@@ -22,7 +22,7 @@ namespace PolymeliaDeployClient.Forms
 
             var agentClient = new AgentRemoteClient();
 
-            agentClient.GetAll().ContinueWith(
+            agentClient.GetAllUnassigned().ContinueWith(
                 t =>
                 {
                     if (t.IsFaulted)
@@ -33,7 +33,7 @@ namespace PolymeliaDeployClient.Forms
                     }
 
                     agentsHeaderTextBlock.Foreground = new SolidColorBrush(Color.FromRgb(106, 196, 234));
-                    agentsHeaderTextBlock.Text = "select agents to assing to an Environment";
+                    agentsHeaderTextBlock.Text = "select agents to assign to an Environment";
 
                     agentsDataGrid.ItemsSource = t.Result;
                 }, TaskScheduler.FromCurrentSynchronizationContext());
@@ -58,16 +58,23 @@ namespace PolymeliaDeployClient.Forms
             DialogResult = false;
         }
 
+
         private void okButton_Click(object sender, RoutedEventArgs e)
         {
             var agents = new List<Agent>();
             
-            foreach ( var selectedAgent in agentsDataGrid.SelectedItems)
+            foreach(var selectedAgent in agentsDataGrid.SelectedItems)
                 agents.Add(selectedAgent as Agent);
 
             SelectedAgents = agents;
 
             DialogResult = true;
+        }
+
+
+        private void agentsDataGrid_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        {
+            okButton.IsEnabled = (e.AddedItems != null && e.AddedItems.Count > 0);
         }
     }
 }

@@ -74,16 +74,20 @@
                 CanUserAddRows="False"
                 Name="agentsDataGrid"
                 AutoGenerateColumns="False"
-                GridLinesVisibility="None">
+                GridLinesVisibility="None" SelectionChanged="agentsDataGrid_SelectionChanged">
                 <DataGrid.Columns>
-                    <DataGridTextColumn
-                        Width="300"
-                        IsReadOnly="True"
-                        Binding="{Binding Role, Mode=TwoWay}" Header="Role" />
                     <DataGridTextColumn
                         Width="*"
                         IsReadOnly="True"
-                        Binding="{Binding ServerName, Mode=TwoWay}" Header="Server" />
+                        Binding="{Binding Role, Mode=OneWay}" Header="Role" />
+                    <DataGridTextColumn
+                        Width="*"
+                        IsReadOnly="True"
+                        Binding="{Binding ServerName, Mode=OneWay}" Header="Server" />
+                    <DataGridCheckBoxColumn
+                        Width="80"
+                        IsReadOnly="True"
+                        Binding="{Binding IsActive, Mode=OneWay}" Header="Active" />
                 </DataGrid.Columns>
 
             </DataGrid>
@@ -98,6 +102,7 @@
                         Margin="0,0,8,0"
                         Height="30"
                         Width="70"
+                        IsEnabled="False"
                         HorizontalAlignment="Right"
                         Content="ADD" Click="okButton_Click"/>
 

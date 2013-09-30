@@ -8,5 +8,7 @@
     public interface IAgentRemoteClient
     {
         Task<IEnumerable<Agent>> GetAll();
+
+        Task<IEnumerable<Agent>> GetAllUnassigned();
     }
 }

@@ -181,7 +181,7 @@ namespace PolymeliaDeployController.Hub
 
         private Agent RegisterNewAgent(string roleName, string agentIpAddress, string serverName)
         {
-            //TODO: Auto activate agent based on some creteria?!
+            //TODO: Auto activate agent based on some criteria?!
             var agent = new Agent
                     {
                         Confirmed = null,

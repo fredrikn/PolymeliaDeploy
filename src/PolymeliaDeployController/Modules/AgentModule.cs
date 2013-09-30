@@ -18,6 +18,18 @@ namespace PolymeliaDeployController.Modules
                     return Response.AsJson(agents);
                 }
             };
+
+
+            Get["agents/unassigned"] = _ =>
+            {
+                using (var db = new PolymeliaDeployDbContext())
+                {
+                    var agents = db.Agents.Where(a => a.EnvironmentId == null && a.Confirmed != null)
+                                          .OrderBy(a => a.Role).ToList();
+
+                    return Response.AsJson(agents);
+                }
+            };
         }
     }
 }

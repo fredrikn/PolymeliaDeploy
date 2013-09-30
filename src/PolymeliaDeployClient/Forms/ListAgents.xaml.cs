@@ -48,7 +48,7 @@ namespace PolymeliaDeployClient.Forms
                     Agents.Clear();
 
                     foreach (var agent in t.Result)
-                        Agents.Add(agent);                        
+                        Agents.Add(agent);                
 
                 }, TaskScheduler.FromCurrentSynchronizationContext());
         }
