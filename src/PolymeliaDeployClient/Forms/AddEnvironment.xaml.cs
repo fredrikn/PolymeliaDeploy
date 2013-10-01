@@ -21,6 +21,8 @@ namespace PolymeliaDeployClient.Forms
 
         public Environment AddedEnvironment { get; private set; }
 
+        public Environment CopyFromEnvironment { private get; set; }
+
         public Project CurrentProject { private get; set; }
 
         private ObservableCollection<Agent> Agents { get; set; }
@@ -53,6 +55,7 @@ namespace PolymeliaDeployClient.Forms
             base.OnContentRendered(e);
 
             copyEnvironmentComboBox.ItemsSource = Environments;
+            copyEnvironmentComboBox.SelectedItem = CopyFromEnvironment;
         }
 
 
@@ -60,7 +63,7 @@ namespace PolymeliaDeployClient.Forms
         {
             if (Environments.Any(env => String.Equals(env.Name.Trim(), environmentName.Text.Trim(), StringComparison.CurrentCultureIgnoreCase)))
             {
-                MessageBox.Show(string.Format("An environemnt with the name '{0}' already exists, please use another name", environmentName.Text), "Already exist");
+                MessageBox.Show(string.Format("An environment with the name '{0}' already exists, please use another name", environmentName.Text), "Already exist");
                 return;
             }
 
@@ -82,7 +85,7 @@ namespace PolymeliaDeployClient.Forms
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Exception while trying to add environment, error: " + ex.Message, "Error white adding environemnt");
+                MessageBox.Show("Exception while trying to add environment, error: " + ex.Message, "Error white adding environment");
                 return;
             }
 

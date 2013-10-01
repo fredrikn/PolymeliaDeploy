@@ -73,6 +73,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Forms\About.xaml.cs">
+      <DependentUpon>About.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Forms\AddAgent.xaml.cs">
       <DependentUpon>AddAgent.xaml</DependentUpon>
     </Compile>
@@ -80,6 +83,9 @@
     <Compile Include="Forms\Converters\DeploymentStatusConverter.cs" />
     <Compile Include="Forms\Deployments.xaml.cs">
       <DependentUpon>Deployments.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\EditEnvironment.xaml.cs">
+      <DependentUpon>EditEnvironment.xaml</DependentUpon>
     </Compile>
     <Compile Include="Forms\SelectAgents.xaml.cs">
       <DependentUpon>SelectAgents.xaml</DependentUpon>
@@ -89,6 +95,10 @@
     </Compile>
     <Compile Include="Workflow\ValidationError.cs" />
     <Page Include="Controls\WorkflowDesignerControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Forms\About.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -105,6 +115,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Forms\Deploy.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Forms\EditEnvironment.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

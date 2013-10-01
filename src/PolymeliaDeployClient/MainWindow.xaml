@@ -11,6 +11,8 @@
     <Window.Resources>
 
         <ContextMenu x:Key="EnvironmentContextMenu">
+            <MenuItem Header="Edit" Click="EditEnvironmentMenuItem_Click" CommandParameter="{Binding Parent, RelativeSource={RelativeSource Self}}"/>
+            <MenuItem Header="Copy" Click="CopyMenuItem_Click" CommandParameter="{Binding Parent, RelativeSource={RelativeSource Self}}"/>
             <MenuItem Header="Remove" Click="RemoveMenuItem_Click" CommandParameter="{Binding Parent, RelativeSource={RelativeSource Self}}"/>
         </ContextMenu>
 
@@ -177,6 +179,7 @@
 						Content="FEEDBACK"
 						Margin="10,0,15,0"
 						FontSize="11"
+                        IsEnabled="False"
 						Style="{StaticResource linkButton}" Height="30" VerticalAlignment="Top"/>
 
                     <Rectangle Height="14" Fill="White" Width="1"/>
@@ -197,7 +200,7 @@
 						Content="ABOUT"
 						Margin="15,0,26,0"
 						FontSize="11"
-						Style="{StaticResource linkButton}"/>
+						Style="{StaticResource linkButton}" Click="aboutButton_Click"/>
 
                 </StackPanel>
 

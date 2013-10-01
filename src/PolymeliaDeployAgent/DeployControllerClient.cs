@@ -57,7 +57,7 @@ namespace PolymeliaDeploy.Agent
 
         public async Task AgentIsReadyForNewTasks()
         {
-            await _hubProxy.Invoke("AgentIsReadyForNewTasks", _serverRole);
+            await _hubProxy.Invoke("AgentIsReadyForNewTasks");
         }
 
 

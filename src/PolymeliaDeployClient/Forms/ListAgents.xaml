@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:converters="clr-namespace:PolymeliaDeployClient.Forms.Converters"
              Background="White"
-             x:Name="settingsControl"
+             x:Name="agentsControl"
              Foreground="Black">
 
     <UserControl.Resources>
@@ -27,7 +27,6 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="55"/>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="60"/>
         </Grid.RowDefinitions>
 
         <Grid Margin="0,0,0,0">
@@ -100,7 +99,7 @@
                         Width="250"
                         BorderBrush="Transparent"
                         BorderThickness="0"
-                        ItemsSource="{Binding ElementName=settingsControl, Path=Agents}"
+                        ItemsSource="{Binding ElementName=agentsControl, Path=Agents}"
                         HorizontalAlignment="Left"
                         VerticalAlignment="Top"
                         Margin = "0">
@@ -113,22 +112,6 @@
                 </ItemsControl>
 
             </Grid>
-
-        </Grid>
-        
-
-        <Grid Grid.Row="2">
-
-            <StackPanel Orientation="Horizontal" Margin="8" HorizontalAlignment="Right">
-
-                <Button
-                        Name="closeButton"
-                        Height="30"
-                        Width="70"
-                        HorizontalAlignment="Right"
-                        Content="CLOSE" Click="CloseButton_OnClick"/>
-
-            </StackPanel>
 
         </Grid>
 

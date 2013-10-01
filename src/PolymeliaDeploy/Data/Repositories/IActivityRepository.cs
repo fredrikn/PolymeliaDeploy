@@ -7,6 +7,6 @@
     {
         Task UpdateActivityTaskStatus(long activityTaskId, ActivityStatus status);
 
-        Task<IEnumerable<ActivityTask>> GetActivityTasks(long lastDeploymentId, string serverRole);
+        Task<IEnumerable<ActivityTask>> GetActivityTasks(long lastDeploymentId, string serverRole, int environmentId);
     }
 }

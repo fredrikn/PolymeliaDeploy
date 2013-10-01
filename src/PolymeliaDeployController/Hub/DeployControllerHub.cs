@@ -67,8 +67,14 @@ namespace PolymeliaDeployController.Hub
             return base.OnConnected().ContinueWith(
                 t =>
                 {
-                    SetCurrentAgentToBeAvailable();
-                    Task.Run( async () => await CheckForAgentActivityAndRunActivities(roleName));
+                    Task.Run(
+                        async () =>
+                            {
+                                var agent = this.GetCurrentAgent();
+
+                                SetAgentToBeAvailable(agent);
+                                await CheckForAgentActivityAndRunActivities(agent);
+                            });
                 });
         }
 
@@ -85,7 +91,7 @@ namespace PolymeliaDeployController.Hub
 
         public async Task Report(ActivityReport report)
         {
-            EnsureAgentIsAuthorized();
+            this.EnsureCurrentAgentIsAuthorized();
 
             await _reportRepository.AddReport(report);
         }
@@ -93,7 +99,7 @@ namespace PolymeliaDeployController.Hub
 
         public async Task ActivityFailed(long activityTaskId)
         {
-            EnsureAgentIsAuthorized();
+            EnsureCurrentAgentIsAuthorized();
 
             await _activityRepository.UpdateActivityTaskStatus(activityTaskId, ActivityStatus.Failed);
         }
@@ -101,20 +107,22 @@ namespace PolymeliaDeployController.Hub
 
         public async Task ActivityCompleted(long activityTaskId)
         {
-            EnsureAgentIsAuthorized();
+            EnsureCurrentAgentIsAuthorized();
 
             if (AreAllAgentsDoneWithActivity(activityTaskId))
                 await _activityRepository.UpdateActivityTaskStatus(activityTaskId, ActivityStatus.Completed);
         }
 
 
-        public async Task AgentIsReadyForNewTasks(string roleName)
+        public async Task AgentIsReadyForNewTasks()
         {
-            EnsureAgentIsAuthorized();
+            EnsureCurrentAgentIsAuthorized();
 
-            SetCurrentAgentToBeAvailable();
+            var agent = GetCurrentAgent();
 
-            await CheckForAgentActivityAndRunActivities(roleName);
+            SetAgentToBeAvailable(agent);
+
+            await CheckForAgentActivityAndRunActivities(agent);
         }
 
 
@@ -126,7 +134,7 @@ namespace PolymeliaDeployController.Hub
                 {
                     var agent = _connectedAgents[Context.ConnectionId];
 
-                    SetCurrentAgentToBeAvailable();
+                    SetAgentToBeAvailable(agent);
 
                     _connectedAgents.Remove(Context.ConnectionId);
 
@@ -153,9 +161,9 @@ namespace PolymeliaDeployController.Hub
             if (agent == null)
                 agent = RegisterNewAgent(roleName, agentIpAddress, serverName);
 
-            if (!agent.Confirmed.HasValue || !agent.IsActive)
+            if (!agent.Confirmed.HasValue || !agent.IsActive || !agent.EnvironmentId.HasValue)
             {
-                Console.WriteLine("Agent from server '{0}' and with the role '{1}' is not confirmed or is inactive. The agent will not be used", serverName, roleName);
+                Console.WriteLine("Agent from server '{0}' and with the role '{1}' is not confirmed, assigned to an environment or is inactive. The agent will not be used", serverName, roleName);
                 throw new SecurityException("Access denied!");
             }
 
@@ -167,7 +175,7 @@ namespace PolymeliaDeployController.Hub
         }
 
 
-        private void EnsureAgentIsAuthorized()
+        private void EnsureCurrentAgentIsAuthorized()
         {
             var agent = GetCurrentAgent();
 
@@ -175,7 +183,6 @@ namespace PolymeliaDeployController.Hub
                 return;
 
             throw new NotAuthorizedException("Agent isn't authorized");
-
         }
 
 
@@ -197,28 +204,30 @@ namespace PolymeliaDeployController.Hub
             return agent;
         }
 
-        private async Task CheckForAgentActivityAndRunActivities(string roleName)
+
+        private async Task CheckForAgentActivityAndRunActivities(Agent agent)
         {
-            var activityTasks = await GetActivityTasks(roleName);
+            var activityTasks = await GetActivityTasks(agent);
 
             var activityTaskDtos = activityTasks as IList<ActivityTaskDto> ?? activityTasks.ToList();
 
             if (activityTaskDtos.Any())
             {
-                SetCurrentAgentToBusy();
+                SetAgentToBusy(agent);
 
                 await Clients.Client(Context.ConnectionId).RunActivities(activityTaskDtos);
 
-                UpdateAgentsLastDeployment(activityTaskDtos);
+                UpdateAgentsLastDeployment(agent, activityTaskDtos);
             }
         }
 
 
-        private async Task<IEnumerable<ActivityTaskDto>> GetActivityTasks(string serverRole)
+        private async Task<IEnumerable<ActivityTaskDto>> GetActivityTasks(Agent agent)
         {
-            var agent = GetCurrentAgent();
-
-            var activites = await _activityRepository.GetActivityTasks(agent.LastDeploymentId == null ? 0 : agent.LastDeploymentId.Value, serverRole);
+            var activites = await _activityRepository.GetActivityTasks(
+                                                                       GetAgentsLatestDeploymentId(agent),
+                                                                       agent.Role,
+                                                                       agent.EnvironmentId.Value);
 
             var actititiesToRun = activites.ToList().Select(a => new ActivityTaskDto
             {
@@ -235,18 +244,22 @@ namespace PolymeliaDeployController.Hub
             });
 
             if (!actititiesToRun.Any(a => a.Status == ActivityStatus.Failed ||
-                a.Status == ActivityStatus.Canceled))
+                                          a.Status == ActivityStatus.Canceled))
                 return actititiesToRun;
 
             return new List<ActivityTaskDto>();
         }
 
 
-        private void UpdateAgentsLastDeployment(IEnumerable<ActivityTaskDto> activityTaskDtos)
+        private static long GetAgentsLatestDeploymentId(Agent agent)
         {
-            var agent = GetCurrentAgent();
-            agent.LastDeploymentId = activityTaskDtos.First().DeploymentId;
+            return agent.LastDeploymentId == null ? 0 : agent.LastDeploymentId.Value;
+        }
 
+
+        private void UpdateAgentsLastDeployment(Agent agent, IEnumerable<ActivityTaskDto> activityTaskDtos)
+        {
+            agent.LastDeploymentId = activityTaskDtos.First().DeploymentId;
             _agentRepository.Update(agent);
         }
 
@@ -265,16 +278,14 @@ namespace PolymeliaDeployController.Hub
         }
 
 
-        private void SetCurrentAgentToBeAvailable()
+        private void SetAgentToBeAvailable(Agent agent)
         {
-            var agent = GetCurrentAgent();
             agent.IsBusy = false;
         }
 
 
-        private void SetCurrentAgentToBusy()
+        private void SetAgentToBusy(Agent agent)
         {
-            var agent = GetCurrentAgent();
             agent.IsBusy = true;
         }
 

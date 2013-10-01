@@ -10,5 +10,7 @@
         Task<IEnumerable<Agent>> GetAll();
 
         Task<IEnumerable<Agent>> GetAllUnassigned();
+
+        Agent Add(Agent agent);
     }
 }

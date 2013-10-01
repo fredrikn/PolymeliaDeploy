@@ -2,16 +2,23 @@
 
 namespace PolymeliaDeployClient.Forms
 {
+    using System;
+    using System.Threading;
     using System.Windows.Controls;
 
-    /// <summary>
-    /// Interaction logic for AddAgent.xaml
-    /// </summary>
+    using PolymeliaDeploy.Controller;
+    using PolymeliaDeploy.Data;
+
     public partial class AddAgent : Window
     {
+        private IAgentRemoteClient _agentRemoteClient;
+
+
         public AddAgent()
         {
             InitializeComponent();
+
+            _agentRemoteClient = new AgentRemoteClient();
 
             roleName.Focus();
         }
@@ -25,7 +32,29 @@ namespace PolymeliaDeployClient.Forms
 
         private void saveButton_Click(object sender, RoutedEventArgs e)
         {
-
+            if (MessageBox.Show(
+                "Are you sure you want to add the agent?",
+                "Add agent confirmation",
+                MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+            {
+                try
+                {
+                    _agentRemoteClient.Add(
+                                            new Agent {
+                                                    Confirmed = DateTime.Now,
+                                                    ConfirmedBy = Thread.CurrentPrincipal.Identity.Name,
+                                                    Role = roleName.Text.Trim(),
+                                                    ServerName = serverName.Text.Trim(),
+                                                    IpAddress = string.Empty,
+                                                    IsActive = IsActiveCheckBox.IsChecked.HasValue && IsActiveCheckBox.IsChecked.Value
+                                                });
+                    DialogResult = true;
+                }
+                catch (Exception)
+                {
+                    MessageBox.Show("Can't add agent, please try again.!");
+                }
+            }
         }
 
 

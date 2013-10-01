@@ -188,13 +188,14 @@ namespace PolymeliaDeployClient
         }
 
 
-        private void AddNewEnvironment()
+        private void AddNewEnvironment(Environment copyFromEnvironment = null)
         {
             var win = new AddEnvironment();
             win.Owner = this;
 
             win.Environments = _environments;
             win.CurrentProject = CurrentProject;
+            win.CopyFromEnvironment = copyFromEnvironment;
 
             if (win.ShowDialog() == true)
             {
@@ -241,29 +242,34 @@ namespace PolymeliaDeployClient
 
         private void addButton_Click(object sender, RoutedEventArgs e)
         {
+            ShowAddNewEnvironment();
+        }
+
+
+        private void EditEnvironmentMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            var editEnvironment = new EditEnvironment();
+            editEnvironment.Owner = this;
+            editEnvironment.SelectedEnvironment = SelectedEnvironment;
+
             blockBackgroundGrid.Visibility = Visibility.Visible;
 
-            AddNewEnvironment();
+            editEnvironment.ShowDialog();
 
             blockBackgroundGrid.Visibility = Visibility.Hidden;
         }
 
 
+        private void CopyMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            var environment = GetEnvironmentFromMenuItem(sender);
+            ShowAddNewEnvironment(environment);
+        }
+
+
         private void RemoveMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            var mi = sender as MenuItem;
-            if (mi == null)
-                return;
-
-            var cm = mi.CommandParameter as ContextMenu;
-            if (cm == null)
-                return;
-
-            var tabItem = cm.PlacementTarget as TabItem;
-            if (tabItem == null)
-                return;
-
-            var environment = tabItem.Header as Environment;
+            var environment = GetEnvironmentFromMenuItem(sender);
 
             if (environment != null)
             {
@@ -273,8 +279,8 @@ namespace PolymeliaDeployClient
                     MessageBoxButton.YesNo) == MessageBoxResult.Yes)
                 {
                     _environmentClient.DeleteEnvironment(environment);
-                    
-                    messageTextBlock.Text = string.Format("Environment '{0}' is deleted", SelectedEnvironment.Name);
+
+                    messageTextBlock.Text = string.Format("Environment '{0}' is deleted", environment.Name);
 
                     _environments.Remove(environment);
 
@@ -302,6 +308,7 @@ namespace PolymeliaDeployClient
             if (MessageBox.Show("Do you want to save the unsaved changes?", "Unsaved changes", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
                 this.Save();
         }
+
 
         private void variableButton_Click(object sender, RoutedEventArgs e)
         {
@@ -347,6 +354,47 @@ namespace PolymeliaDeployClient
 
                 tabItem.Content = listAgents;
             }
+        }
+
+
+        private void ShowAddNewEnvironment(Environment copyFromEnvironment = null)
+        {
+            blockBackgroundGrid.Visibility = Visibility.Visible;
+
+            AddNewEnvironment(copyFromEnvironment);
+
+            blockBackgroundGrid.Visibility = Visibility.Hidden;
+        }
+
+
+        private static Environment GetEnvironmentFromMenuItem(object sender)
+        {
+            var mi = sender as MenuItem;
+            if (mi == null)
+                return null;
+
+            var cm = mi.CommandParameter as ContextMenu;
+            if (cm == null)
+                return null;
+
+            var tabItem = cm.PlacementTarget as TabItem;
+            if (tabItem == null)
+                return null;
+
+            return tabItem.Header as Environment;
+        }
+
+
+        private void aboutButton_Click(object sender, RoutedEventArgs e)
+        {
+            var about = new About();
+            about.Owner = this;
+
+            blockBackgroundGrid.Visibility = Visibility.Visible;
+
+            about.ShowDialog();
+
+            blockBackgroundGrid.Visibility = Visibility.Hidden;
         }
     }
 }

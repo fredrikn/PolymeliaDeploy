@@ -1,15 +1,16 @@
-﻿<Window x:Class="PolymeliaDeployClient.Forms.AddEnvironment"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+﻿<Window x:Class="PolymeliaDeployClient.Forms.EditEnvironment"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Height="680"
+        Height="630"
         Foreground="black"
         Background="White"
         WindowStyle="None"
         WindowStartupLocation="CenterOwner"
         AllowsTransparency="True"
         ResizeMode="CanResizeWithGrip"
+        x:Name="editEnvironmentWindow"
         Width="650">
-    
+
     <Grid Margin="30">
 
         <Grid.RowDefinitions>
@@ -27,20 +28,20 @@
                     Foreground="#aaaaaa"
                     FontWeight="Black"
                     Margin="0,0,0,8"
-                    Text="NEW ENVIRONMENT"/>
+                    Text="EDIT ENVIRONMENT"/>
 
                 <TextBlock
                     VerticalAlignment="Center"
                     FontSize="25"
                     Foreground="#6ac4ea"
-                    Text="create an environment"/>
+                    Text="edit environment"/>
 
             </StackPanel>
-            
+
         </Grid>
 
         <Grid Grid.Row="1" Margin="0,10,0,0">
-            
+
             <StackPanel VerticalAlignment="Top"  Margin="0,0,0,0" Grid.Row="1">
 
                 <TextBlock Text="NAME" Margin="0,4,0,2"></TextBlock>
@@ -50,6 +51,7 @@
                     Height="30"
                     MaxLength="50"
                     Margin="0,2,0,4"
+                    Text="{Binding ElementName=editEnvironmentWindow, Path=SelectedEnvironment.Name, Mode=TwoWay}"
                     TextChanged="environmentName_TextChanged"></TextBox>
                 <TextBlock TextWrapping="Wrap"
                            FontStyle="Italic"
@@ -57,21 +59,13 @@
                            Margin="0,0,0,10">
                 </TextBlock>
 
-                <TextBlock Text="COPY FROM" Margin="0,4,0,2" ></TextBlock>
-                <ComboBox
-                    VerticalContentAlignment="Center"
-                    Name="copyEnvironmentComboBox"
-                    Height="30"
-                    Margin="0,2,0,15"
-                    DisplayMemberPath="Name"
-                    SelectedValuePath="Id"/>
-
-                <TextBlock Text="DESCRIPTION" Margin="0,4,0,2" ></TextBlock>
+                <TextBlock Text="DESCRIPTION" Margin="0,4,0,2"></TextBlock>
                 <TextBox
                     AcceptsReturn="True"
                     Name="descriptionTextBox"
                     Height="80"
                     Margin="0,2,0,15"
+                    Text="{Binding ElementName=editEnvironmentWindow, Path=SelectedEnvironment.Description, Mode=TwoWay}"
                     MaxLength="500"></TextBox>
 
                 <TextBlock Text="AGENTS" Margin="0,4,0,2" ></TextBlock>
@@ -89,7 +83,7 @@
                            Style="{StaticResource linkButtonOnWhiteBg}"
                            HorizontalAlignment="Left"
                            Margin="0,0,10,0"
-                           Content="ADD" Click="addButton_Click"/>
+                           Content="ADD"/>
 
                         <Button
                            Name="removeButton"
@@ -146,7 +140,7 @@
         <Grid Grid.Row="2">
 
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                <Button Name="okButton" IsEnabled="False" Content="SAVE" Margin="0,0,8,0" Width="70" Height="30" HorizontalAlignment="Right" Click="okButton_Click"></Button>
+                <Button Name="okButton" IsEnabled="False" Content="SAVE" Margin="0,0,8,0" Width="70" Height="30" HorizontalAlignment="Right"></Button>
                 <Button Name="cancelButton" Content="CANCEL" Width="70" Height="30" HorizontalAlignment="Right" Click="cancelButton_Click"></Button>
             </StackPanel>
 

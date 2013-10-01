@@ -3,6 +3,7 @@
 namespace PolymeliaDeployController.Modules
 {
     using Nancy;
+    using Nancy.ModelBinding;
 
     using PolymeliaDeploy.Data;
 
@@ -28,6 +29,20 @@ namespace PolymeliaDeployController.Modules
                                           .OrderBy(a => a.Role).ToList();
 
                     return Response.AsJson(agents);
+                }
+            };
+
+
+            Put["agents"] = _ =>
+            {
+                var agent = this.Bind<Agent>();
+
+                using (var db = new PolymeliaDeployDbContext())
+                {
+                    db.Agents.Add(agent);
+                    db.SaveChanges();
+
+                    return Response.AsJson(agent);
                 }
             };
         }
