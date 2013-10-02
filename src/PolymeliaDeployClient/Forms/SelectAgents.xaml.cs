@@ -2,10 +2,14 @@
 
 namespace PolymeliaDeployClient.Forms
 {
+    using System;
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
+    using System.Linq;
     using System.Threading.Tasks;
     using System.Windows.Media;
 
+    using PolymeliaDeploy.Agent;
     using PolymeliaDeploy.Controller;
     using PolymeliaDeploy.Data;
 
@@ -16,9 +20,25 @@ namespace PolymeliaDeployClient.Forms
     {
         public IEnumerable<Agent> SelectedAgents { get; private set; }
 
+        public ObservableCollection<Agent> Agents { get; private set; }
+
+        public IEnumerable<Agent> ExcludAgents { private get; set; }
+
+        public IEnumerable<Agent> IncludeAgents { private get; set; }
+
         public SelectAgents()
         {
+            Agents = new ObservableCollection<Agent>();
+            ExcludAgents = new List<Agent>();
+            IncludeAgents = new List<Agent>();
+
             InitializeComponent();
+        }
+
+
+        protected override void OnContentRendered(EventArgs e)
+        {
+            base.OnContentRendered(e);
 
             var agentClient = new AgentRemoteClient();
 
@@ -35,7 +55,12 @@ namespace PolymeliaDeployClient.Forms
                     agentsHeaderTextBlock.Foreground = new SolidColorBrush(Color.FromRgb(106, 196, 234));
                     agentsHeaderTextBlock.Text = "select agents to assign to an Environment";
 
-                    agentsDataGrid.ItemsSource = t.Result;
+                    foreach (var agent in t.Result.Where(agent => ExcludAgents.All(a => a.Id != agent.Id)))
+                        Agents.Add(agent);
+
+                    foreach (var includeAgent in IncludeAgents.Where(includeAgent => Agents.All(a => a.Id != includeAgent.Id)))
+                        this.Agents.Add(includeAgent);
+
                 }, TaskScheduler.FromCurrentSynchronizationContext());
         }
 
@@ -47,7 +72,8 @@ namespace PolymeliaDeployClient.Forms
             var registerAgent = new AddAgent();
             registerAgent.Owner = this;
 
-            registerAgent.ShowDialog();
+            if (registerAgent.ShowDialog() == true)
+                Agents.Add(registerAgent.AddedAgent);
 
             Opacity = 1;
         }

@@ -45,6 +45,23 @@ namespace PolymeliaDeploy.Controller
         }
 
 
+        public async Task<IEnumerable<Agent>> GetAllAgentsForEnvironment(int environmentId)
+        {
+            using (var client = new ControllerClientFactory().CreateWebHttpClient())
+            {
+                var requestUrl = string.Format("agents/environment/{0}", environmentId);
+
+                var response = await client.GetAsync(requestUrl);
+
+                if (response.IsSuccessStatusCode)
+                    return await response.Content.ReadAsAsync<IEnumerable<Agent>>();
+
+                throw new HttpRequestException(
+                    string.Format("{0} ({1})", (int)response.StatusCode, response.ReasonPhrase));
+            }
+        }
+
+
         public Agent Add(Agent agent)
         {
             using (var client = new ControllerClientFactory().CreateWebHttpClient())

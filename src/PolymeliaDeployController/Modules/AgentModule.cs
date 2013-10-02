@@ -22,12 +22,28 @@ namespace PolymeliaDeployController.Modules
 
 
             Get["agents/unassigned"] = _ =>
+                {
+                    using (var db = new PolymeliaDeployDbContext())
+                    {
+                        var agents =
+                            db.Agents.Where(a => a.EnvironmentId == null && a.Confirmed != null)
+                                     .OrderBy(a => a.Role)
+                                     .ToList();
+
+                        return Response.AsJson(agents);
+                    }
+                };
+
+
+            Get["agents/environment/{EnvironmentId}"] = param =>
             {
+                int environmentId = int.Parse(param.EnvironmentId);
+
                 using (var db = new PolymeliaDeployDbContext())
                 {
-                    var agents = db.Agents.Where(a => a.EnvironmentId == null && a.Confirmed != null)
+                    var agents = db.Agents.Where(a => a.EnvironmentId == environmentId)
                                           .OrderBy(a => a.Role).ToList();
-
+                    
                     return Response.AsJson(agents);
                 }
             };

@@ -13,6 +13,7 @@ namespace PolymeliaDeployClient.Forms
     {
         private IAgentRemoteClient _agentRemoteClient;
 
+        public Agent AddedAgent { get; private set; }
 
         public AddAgent()
         {
@@ -39,15 +40,20 @@ namespace PolymeliaDeployClient.Forms
             {
                 try
                 {
-                    _agentRemoteClient.Add(
-                                            new Agent {
-                                                    Confirmed = DateTime.Now,
-                                                    ConfirmedBy = Thread.CurrentPrincipal.Identity.Name,
-                                                    Role = roleName.Text.Trim(),
-                                                    ServerName = serverName.Text.Trim(),
-                                                    IpAddress = string.Empty,
-                                                    IsActive = IsActiveCheckBox.IsChecked.HasValue && IsActiveCheckBox.IsChecked.Value
-                                                });
+                    var addedAgent = new Agent
+                                         {
+                                             Confirmed = DateTime.Now,
+                                             ConfirmedBy = Thread.CurrentPrincipal.Identity.Name,
+                                             Role = roleName.Text.Trim(),
+                                             ServerName = serverName.Text.Trim(),
+                                             IpAddress = string.Empty,
+                                             IsActive =
+                                                 IsActiveCheckBox.IsChecked.HasValue
+                                                 && IsActiveCheckBox.IsChecked.Value
+                                         };
+
+                    AddedAgent = _agentRemoteClient.Add(addedAgent);
+
                     DialogResult = true;
                 }
                 catch (Exception)

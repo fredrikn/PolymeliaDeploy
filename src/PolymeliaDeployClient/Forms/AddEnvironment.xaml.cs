@@ -111,10 +111,9 @@ namespace PolymeliaDeployClient.Forms
 
             var selectAgents = new SelectAgents();
             selectAgents.Owner = this;
+            selectAgents.ExcludAgents = Agents;
 
-            var status = selectAgents.ShowDialog();
-
-            if (status != null && status.Value)
+            if (selectAgents.ShowDialog() == true)
             {
                 var agents = selectAgents.SelectedAgents.ToList();
 
@@ -123,6 +122,19 @@ namespace PolymeliaDeployClient.Forms
             }
 
             Opacity = 1;
+        }
+
+
+        private void agentsGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            removeButton.IsEnabled = agentsGrid.SelectedItem != null;
+        }
+
+
+        private void RemoveButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            foreach (var selectedAgent in agentsGrid.SelectedItems.OfType<Agent>().ToList())
+                Agents.Remove(selectedAgent);
         }
     }
 }

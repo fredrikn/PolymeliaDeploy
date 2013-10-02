@@ -83,7 +83,7 @@
                            Style="{StaticResource linkButtonOnWhiteBg}"
                            HorizontalAlignment="Left"
                            Margin="0,0,10,0"
-                           Content="ADD"/>
+                           Content="ADD" Click="addButton_Click"/>
 
                         <Button
                            Name="removeButton"
@@ -92,7 +92,7 @@
                            HorizontalAlignment="Left"
                            Margin="10,0,0,0"
                            IsEnabled="False"
-                           Content="REMOVE"/>
+                           Content="REMOVE" Click="removeButton_Click"/>
 
                     </StackPanel>
 
@@ -101,7 +101,7 @@
                 </Grid>
 
                 <Grid Margin="0,4,0,0">
-
+                    
                     <DataGrid
                         BorderBrush="White"
                         MinRowHeight="25"
@@ -112,7 +112,8 @@
                         Name="agentsGrid"
                         AutoGenerateColumns="False"
                         HorizontalGridLinesBrush="SlateGray"
-                        VerticalGridLinesBrush="SlateGray">
+                        ItemsSource="{Binding ElementName=editEnvironmentWindow, Path=Agents}"
+                        VerticalGridLinesBrush="SlateGray" SelectionChanged="agentsGrid_SelectionChanged">
                         <DataGrid.Columns>
                             <DataGridTextColumn
                                 Width="250"
@@ -122,9 +123,21 @@
                                 Width="*"
                                 IsReadOnly="True"
                                 Binding="{Binding ServerName, Mode=OneWay}" Header="Server" />
+                            <DataGridCheckBoxColumn
+                                Width="60"
+                                IsReadOnly="True"
+                                Binding="{Binding IsActive, Mode=OneWay}" Header="Active" />
                         </DataGrid.Columns>
 
                     </DataGrid>
+
+                    <TextBlock 
+                        Margin="5,30,0,0" 
+                        FontStyle="Italic" 
+                        FontSize="15"
+                        Name="loadingAgentsBlock"
+                        Foreground="DarkOrange">Wait while loading agents...</TextBlock>
+                    
                 </Grid>
 
                 <TextBlock TextWrapping="Wrap"

@@ -7,6 +7,7 @@
         Foreground="black"
         Background="White"
         WindowStyle="None"
+        Name="SelectAgentsWindow"
         AllowsTransparency="True"
         ResizeMode="CanResizeWithGrip"
         WindowStartupLocation="CenterOwner">
@@ -73,6 +74,7 @@
                 CanUserDeleteRows="False"
                 CanUserAddRows="False"
                 Name="agentsDataGrid"
+                ItemsSource="{Binding ElementName=SelectAgentsWindow, Path=Agents}"
                 AutoGenerateColumns="False"
                 GridLinesVisibility="None" SelectionChanged="agentsDataGrid_SelectionChanged">
                 <DataGrid.Columns>

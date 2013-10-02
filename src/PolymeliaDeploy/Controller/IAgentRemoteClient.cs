@@ -11,6 +11,8 @@
 
         Task<IEnumerable<Agent>> GetAllUnassigned();
 
+        Task<IEnumerable<Agent>> GetAllAgentsForEnvironment(int environmentId);
+
         Agent Add(Agent agent);
     }
 }
